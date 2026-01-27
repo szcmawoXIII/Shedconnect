@@ -116,6 +116,12 @@ function selectPawn(user) {
             type: "pawn_info",
             user
         }));
+
+        // <<< ДОБАВЛЕНО >>>
+        socket.send(JSON.stringify({
+            type: "balance_request",
+            user
+        }));
     }
 }
 
@@ -194,5 +200,6 @@ setInterval(() => {
         user: currentPawn
     }));
 }, 2000);
+
 
 
