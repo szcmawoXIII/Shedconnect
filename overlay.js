@@ -32,7 +32,7 @@ document.querySelector('#tab-persona').classList.add('active');
 
 // Локально: ws://localhost:17172
 // На стриме: ws://IP_СТРИМЕРА:17172
-const socket = new WebSocket("ws://localhost:17172");
+const socket = new WebSocket("wss://localhost:4433");
 
 socket.onopen = () => {
     console.log("[OVERLAY] WebSocket открыт");
@@ -194,3 +194,4 @@ setInterval(() => {
         user: currentPawn
     }));
 }, 2000);
+
