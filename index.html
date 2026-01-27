@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Shedconnect Overlay</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="overlay-root">
+
+    <!-- ЛЕВАЯ КОЛОНКА — СПИСОК ПЕШЕК -->
+    <div id="pawn-list-panel">
+        <h2>Активные пешки</h2>
+        <div id="pawn-list"></div>
+        <button id="refresh-list">Обновить список</button>
+    </div>
+
+    <!-- ПРАВАЯ КОЛОНКА — ИНФОРМАЦИЯ О ПЕШКЕ -->
+    <div id="pawn-panel">
+
+        <div id="pawn-header">
+            <div id="pawn-portrait">
+                <div class="portrait-frame">
+                    <div class="portrait-inner"></div>
+                </div>
+            </div>
+
+            <div id="pawn-main-info">
+
+                <div id="pawn-name-row">
+                    <div id="pawn-name">Нет выбранной пешки</div>
+                    <div id="pawn-balance">—</div>
+                </div>
+
+                <!-- Кнопки действий скрыты (логика через Twitch‑бота) -->
+                <div id="pawn-actions">
+                    <button id="spawn-pawn-btn" style="display:none;">Призвать пешку</button>
+                    <button id="delete-pawn-btn" style="display:none;">Удалить пешку</button>
+                </div>
+
+                <div id="pawn-health-bar" class="rw-bar">
+                    <div class="rw-bar-fill" id="pawn-health-fill"></div>
+                    <span class="rw-bar-label">Здоровье</span>
+                </div>
+
+                <div id="pawn-mood-bar" class="rw-bar">
+                    <div class="rw-bar-fill mood" id="pawn-mood-fill"></div>
+                    <span class="rw-bar-label">Настроение</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ВКЛАДКИ -->
+        <div id="tabs">
+            <button data-tab="persona">Персона</button>
+            <button data-tab="needs">Нужды</button>
+            <button data-tab="health">Здоровье</button>
+        </div>
+
+        <!-- КОНТЕНТ ВКЛАДОК -->
+        <div id="content">
+            <div class="tab" id="tab-persona"></div>
+            <div class="tab" id="tab-needs"></div>
+            <div class="tab" id="tab-health"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module" src="overlay.js"></script>
+
+</body>
+</html>
