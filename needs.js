@@ -1,5 +1,4 @@
-// needs.js
-// Вкладка "Нужды" — сортировка мыслей по moodOffset (от + к -)
+// needs.js — вкладка "Нужды"
 
 const needNamesRu = {
     Food: "Сытость",
@@ -14,7 +13,7 @@ export function renderNeeds(info) {
     const container = document.querySelector("#tab-needs");
     if (!container) return;
 
-    if (!info || !info.found) {
+    if (!info) {
         container.innerHTML = "Пешка не найдена";
         return;
     }
@@ -22,12 +21,11 @@ export function renderNeeds(info) {
     const needs = info.needs || {};
     const thoughts = info.thoughts || [];
 
-    // Левая колонка — нужды
     const needsLeft = Object.entries(needs)
         .filter(([name]) => needNamesRu[name])
         .map(([name, val]) => {
             const ru = needNamesRu[name] || name;
-            const percent = Math.round(val * 100);
+            const percent = Math.round((val <= 1 ? val * 100 : val));
 
             return `
                 <div style="margin-bottom: 10px;">
@@ -44,21 +42,21 @@ export function renderNeeds(info) {
         })
         .join("");
 
-    // Группировка мыслей
     const grouped = {};
 
     for (const t of thoughts) {
+        if (!t || !t.label) continue;
         const key = t.label.trim().toLowerCase();
         if (!grouped[key]) {
             grouped[key] = { label: t.label, total: 0, count: 0 };
         }
-        grouped[key].total += t.moodOffset;
+        grouped[key].total += t.moodOffset ?? 0;
         grouped[key].count++;
     }
 
     const merged = Object.values(grouped)
         .filter(t => Math.abs(t.total) > 0.01)
-        .sort((a, b) => b.total - a.total); // сортировка от + к -
+        .sort((a, b) => b.total - a.total);
 
     const thoughtsRight = merged
         .map(t => {
