@@ -1,5 +1,5 @@
 // overlay.js — стабильная версия под Supabase
-console.log("OVERLAY.JS + SUPABASE FINAL v1");
+console.log("OVERLAY.JS + SUPABASE FINAL v2");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -126,7 +126,14 @@ function normalizeHealthPercent(value) {
 }
 
 function updatePawnInfo(info) {
+    // ===============================
+    // КРИТИЧЕСКОЕ: помечаем пешку найденной
+    // ===============================
+    info.found = true;
+
+    // ===============================
     // JSON-поля
+    // ===============================
     info.persona = tryParse(info.persona, {});
     info.needs = tryParse(info.needs, {});
     info.healthParts = tryParse(info.healthParts, []);
