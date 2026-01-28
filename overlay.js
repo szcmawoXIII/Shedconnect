@@ -1,5 +1,5 @@
 // overlay.js — версия под Supabase
-console.log("OVERLAY.JS + SUPABASE v2");
+console.log("OVERLAY.JS + SUPABASE v3");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -10,8 +10,8 @@ import { renderHealth } from "./health.js";
 // НАСТРОЙКИ SUPABASE
 // ===============================
 
-const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
+const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -47,7 +47,7 @@ async function loadPawnList() {
         return;
     }
 
-    renderPawnList(data.map(x => x.user));
+    renderPawnList(data?.map(x => x.user) ?? []);
 }
 
 document.querySelector("#refresh-list").onclick = loadPawnList;
@@ -194,7 +194,6 @@ supabase
         loadPawnList();
     })
     .subscribe();
-
 
 // ===============================
 // ЗАПУСК
