@@ -9,14 +9,12 @@
 
 <div id="overlay-root">
 
-    <!-- ЛЕВАЯ КОЛОНКА — СПИСОК ПЕШЕК -->
     <div id="pawn-list-panel">
         <h2>Активные пешки</h2>
         <div id="pawn-list"></div>
         <button id="refresh-list">Обновить список</button>
     </div>
 
-    <!-- ПРАВАЯ КОЛОНКА — ИНФОРМАЦИЯ О ПЕШКЕ -->
     <div id="pawn-panel">
 
         <div id="pawn-header">
@@ -50,28 +48,18 @@
             </div>
         </div>
 
-        <!-- ВКЛАДКИ -->
         <div id="tabs">
             <button data-tab="persona">Персона</button>
             <button data-tab="needs">Нужды</button>
             <button data-tab="health">Здоровье</button>
         </div>
 
-        <!-- КОНТЕНТ ВКЛАДОК -->
         <div id="content">
-
-            <div class="tab" id="tab-persona">
-                <div id="persona"></div>
-            </div>
-
+            <div class="tab" id="tab-persona"></div>
             <div class="tab" id="tab-needs">
-                <div id="needs"></div>
+                <div id="mood-buffs"></div>
             </div>
-
-            <div class="tab" id="tab-health">
-                <div id="health"></div>
-            </div>
-
+            <div class="tab" id="tab-health"></div>
         </div>
 
     </div>
