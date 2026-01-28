@@ -24,36 +24,39 @@ export function renderPersona(info) {
         return;
     }
 
-    const p = info.persona || {};
-    const skills = info.skills || {};
-    const passions = info.passions || {};
-    const traits = Array.isArray(info.traits) ? info.traits : [];
+    // ГАРАНТИРОВАННОЕ ПРИВЕДЕНИЕ ТИПОВ
+    const p = info.persona && typeof info.persona === "object" ? info.persona : {};
+    const skills = info.skills && typeof info.skills === "object" ? info.skills : {};
+    const passions = info.passions && typeof info.passions === "object" ? info.passions : {};
+    const traits = Array.isArray(info.traits) ? info.traits.filter(t => typeof t === "string") : [];
 
-    const disabledList = Array.isArray(p.disabled) ? p.disabled : [];
+    // disabled может содержать null, undefined, объекты, числа — чистим
+    const disabledList = Array.isArray(p.disabled)
+        ? p.disabled.filter(d => typeof d === "string" && d.trim() !== "")
+        : [];
 
     const violentDisabled =
-        disabledList.some(d => typeof d === "string" && d.toLowerCase().includes("насили")) ?? false;
+        disabledList.some(d => d.toLowerCase().includes("насили")) ?? false;
 
     const leftHtml = [];
 
-    if (p.gender) leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
-    if (p.age) leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
-    if (p.xenotype) leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
+    if (typeof p.gender === "string") leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
+    if (typeof p.age === "number") leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
+    if (typeof p.xenotype === "string") leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
 
     if (traits.length) {
         leftHtml.push(`<h3>Черты:</h3>`);
         leftHtml.push(traits.map(t => `<div>[${t}]</div>`).join(""));
     }
 
-    // 🔥 Исправлено: фильтрация только строк
-    const disabledClean = disabledList.filter(d => typeof d === "string" && d.trim() !== "");
-
-    if (disabledClean.length) {
+    if (disabledList.length) {
         leftHtml.push(`<h3>Недоступные работы:</h3>`);
-        leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
+        leftHtml.push(disabledList.map(d => `<div>[${d}]</div>`).join(""));
     }
 
+    // РЕНДЕР НАВЫКОВ
     const skillsHtml = Object.entries(skills)
+        .filter(([_, lvl]) => typeof lvl === "number") // защита
         .map(([name, lvl]) => {
             const isViolenceSkill = (name === "Shooting" || name === "Melee");
             const isBlocked = violentDisabled && isViolenceSkill;
