@@ -1,13 +1,19 @@
-// overlay.js — финальная версия, связанная с модом через WebSocket
-// БЕЗ хранения валюты, БЕЗ начисления, только отображение баланса,
-// который приходит от Twitch‑бота через мод.
+// overlay.js — версия под Supabase
+console.log("OVERLAY.JS + SUPABASE v2");
 
-console.log("OVERLAY.JS FINAL v1");
-
-// Вкладки
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
 import { renderNeeds } from "./needs.js";
 import { renderHealth } from "./health.js";
+
+// ===============================
+// НАСТРОЙКИ SUPABASE
+// ===============================
+
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentPawn = null;
 
@@ -27,62 +33,24 @@ document.querySelectorAll('#tabs button').forEach(btn => {
 document.querySelector('#tab-persona').classList.add('active');
 
 // ===============================
-// WEBSOCKET К МОДУ
+// ЗАГРУЗКА СПИСКА ПЕШЕК
 // ===============================
 
-// Локально: ws://localhost:17172
-// На стриме: ws://IP_СТРИМЕРА:17172
-const socket = new WebSocket("ws://" + location.hostname + ":17172");
+async function loadPawnList() {
+    const { data, error } = await supabase
+        .from("pawns")
+        .select("user")
+        .order("user", { ascending: true });
 
-socket.onopen = () => {
-    console.log("[OVERLAY] WebSocket открыт");
-    requestPawnList();
-};
-
-socket.onmessage = (event) => {
-    let data;
-    try {
-        data = JSON.parse(event.data);
-    } catch {
+    if (error) {
+        console.error("Ошибка загрузки списка пешек:", error);
         return;
     }
 
-    switch (data.type) {
-        case "all_pawns":
-            renderPawnList(data.pawns);
-            break;
-
-        case "pawn_info":
-            updatePawnInfo(data.info);
-            break;
-
-        case "balance_update":
-            updateBalance(data);
-            break;
-    }
-};
-
-socket.onerror = (e) => {
-    console.error("[OVERLAY] WebSocket error", e);
-};
-
-socket.onclose = () => {
-    console.warn("[OVERLAY] WebSocket закрыт");
-};
-
-// ===============================
-// СПИСОК ПЕШЕК
-// ===============================
-
-function requestPawnList() {
-    if (socket.readyState !== WebSocket.OPEN) return;
-
-    socket.send(JSON.stringify({
-        type: "all_pawns"
-    }));
+    renderPawnList(data.map(x => x.user));
 }
 
-document.querySelector("#refresh-list").onclick = requestPawnList;
+document.querySelector("#refresh-list").onclick = loadPawnList;
 
 function renderPawnList(list) {
     const container = document.querySelector("#pawn-list");
@@ -105,36 +73,37 @@ function renderPawnList(list) {
 // ВЫБОР ПЕШКИ
 // ===============================
 
-function selectPawn(user) {
+async function selectPawn(user) {
     currentPawn = user;
 
     document.querySelector("#pawn-name").textContent = user;
     document.querySelector("#pawn-balance").textContent = "—";
 
-    if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({
-            type: "pawn_info",
-            user
-        }));
-
-        // <<< ДОБАВЛЕНО >>>
-        socket.send(JSON.stringify({
-            type: "balance_request",
-            user
-        }));
-    }
+    await loadPawnInfo(user);
+    await loadBalance(user);
 }
 
 // ===============================
-// ОБНОВЛЕНИЕ ПЕШКИ
+// ЗАГРУЗКА ИНФОРМАЦИИ О ПЕШКЕ
 // ===============================
 
-function updatePawnInfo(info) {
-    if (!info || !info.found) {
+async function loadPawnInfo(user) {
+    const { data, error } = await supabase
+        .from("pawns")
+        .select("*")
+        .eq("user", user)
+        .single();
+
+    if (error || !data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
-        document.querySelector("#pawn-balance").textContent = "—";
         return;
     }
+
+    updatePawnInfo(data);
+}
+
+function updatePawnInfo(info) {
+    if (!info) return;
 
     document.querySelector("#pawn-name").textContent = info.user;
 
@@ -160,8 +129,20 @@ function updatePawnInfo(info) {
 }
 
 // ===============================
-// ОБНОВЛЕНИЕ БАЛАНСА (от Twitch‑бота)
+// ЗАГРУЗКА БАЛАНСА
 // ===============================
+
+async function loadBalance(user) {
+    const { data, error } = await supabase
+        .from("balances")
+        .select("balance")
+        .eq("user", user)
+        .single();
+
+    if (error || !data) return;
+
+    updateBalance({ user, balance: data.balance });
+}
 
 function updateBalance(data) {
     if (!data || !data.user) return;
@@ -193,14 +174,30 @@ function setBar(selector, percent) {
 
 setInterval(() => {
     if (!currentPawn) return;
-    if (socket.readyState !== WebSocket.OPEN) return;
-
-    socket.send(JSON.stringify({
-        type: "pawn_info",
-        user: currentPawn
-    }));
+    loadPawnInfo(currentPawn);
+    loadBalance(currentPawn);
 }, 2000);
 
+// ===============================
+// REALTIME: ОБНОВЛЕНИЕ ПЕШЕК В РЕАЛЬНОМ ВРЕМЕНИ
+// ===============================
+
+supabase
+    .channel("pawns-realtime")
+    .on("postgres_changes", { event: "*", schema: "public", table: "pawns" }, payload => {
+        if (!currentPawn) return;
+
+        if (payload.new?.user?.toLowerCase() === currentPawn.toLowerCase()) {
+            updatePawnInfo(payload.new);
+        }
+
+        loadPawnList();
+    })
+    .subscribe();
 
 
+// ===============================
+// ЗАПУСК
+// ===============================
 
+loadPawnList();
