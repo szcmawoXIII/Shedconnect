@@ -1,6 +1,21 @@
 // persona.js
 // Вкладка "Персона" — без портрета
 
+const skillOrder = [
+    "Melee",
+    "Mining",
+    "Plants",
+    "Social",
+    "Animals",
+    "Cooking",
+    "Artistic",
+    "Crafting",
+    "Medicine",
+    "Shooting",
+    "Construction",
+    "Intellectual"
+];
+
 const skillNamesRu = {
     Shooting: "Дальний бой",
     Melee: "Ближний бой",
@@ -16,6 +31,22 @@ const skillNamesRu = {
     Intellectual: "Умственный труд"
 };
 
+// соответствие навыков → работ RimWorld
+const skillToWorkType = {
+    Shooting: "Охота",
+    Melee: "Охота",
+    Construction: "Строитель",
+    Mining: "Шахтёр",
+    Cooking: "Повар",
+    Plants: "Садовод",
+    Animals: "Животновод",
+    Crafting: "Ремесло",
+    Artistic: "Кузнец",
+    Medicine: "Доктор",
+    Social: "Социальная работа",
+    Intellectual: "Исследования"
+};
+
 export function renderPersona(info) {
     const container = document.querySelector("#tab-persona");
     if (!container) return;
@@ -28,9 +59,7 @@ export function renderPersona(info) {
     const p = info.persona || {};
     const skills = info.skills || {};
     const passions = info.passions || {};
-
-    const violentDisabled =
-        p.disabled?.some(d => typeof d === "string" && d.toLowerCase().includes("насили")) ?? false;
+    const disabledWorks = p.disabled || [];
 
     // Левая колонка
     const leftHtml = [];
@@ -44,43 +73,44 @@ export function renderPersona(info) {
         leftHtml.push(info.traits.map(t => `<div>[${t}]</div>`).join(""));
     }
 
-    if (p.disabled?.length) {
-        const disabledClean = p.disabled.filter(d => d.trim() !== "");
-        if (disabledClean.length) {
+    if (disabledWorks.length) {
+        const clean = disabledWorks.filter(d => d.trim() !== "");
+        if (clean.length) {
             leftHtml.push(`<h3>Недоступные работы:</h3>`);
-            leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
+            leftHtml.push(clean.map(d => `<div>[${d}]</div>`).join(""));
         }
     }
 
-    // Правая колонка — навыки
-    const skillsHtml = Object.entries(skills)
-        .map(([name, lvl]) => {
-            const isViolenceSkill = (name === "Shooting" || name === "Melee");
-            const isBlocked = violentDisabled && isViolenceSkill;
+    // Правая колонка — навыки в правильном порядке
+    const skillsHtml = skillOrder.map(name => {
+        const workType = skillToWorkType[name];
+        const isBlocked = disabledWorks.some(d => d.toLowerCase().includes(workType.toLowerCase()));
 
-            const displayValue = isBlocked ? "—" : lvl;
+        const lvl = skills[name];
+        const passion = passions[name];
 
-            const passion =
-                isBlocked
-                    ? ""
-                    : passions[name] === 1 ? "🔥"
-                    : passions[name] === 2 ? "🔥🔥"
-                    : "";
+        const displayValue = isBlocked ? "—" : lvl;
 
-            return `
-                <div style="
-                    display: grid;
-                    grid-template-columns: 1fr auto auto;
-                    gap: 6px;
-                    margin-bottom: 3px;
-                ">
-                    <div>${skillNamesRu[name] || name}</div>
-                    <div style="text-align:right;">${passion}</div>
-                    <div style="text-align:right;">${displayValue}</div>
-                </div>
-            `;
-        })
-        .join("");
+        const passionIcon =
+            isBlocked
+                ? ""
+                : passion === 1 ? "🔥"
+                : passion === 2 ? "🔥🔥"
+                : "";
+
+        return `
+            <div style="
+                display: grid;
+                grid-template-columns: 1fr auto auto;
+                gap: 6px;
+                margin-bottom: 3px;
+            ">
+                <div>${skillNamesRu[name] || name}</div>
+                <div style="text-align:right;">${passionIcon}</div>
+                <div style="text-align:right;">${displayValue}</div>
+            </div>
+        `;
+    }).join("");
 
     container.innerHTML = `
         <div style="display: flex; gap: 25px;">
