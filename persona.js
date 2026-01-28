@@ -27,32 +27,30 @@ export function renderPersona(info) {
     const p = info.persona || {};
     const skills = info.skills || {};
     const passions = info.passions || {};
-    const traits = info.traits || [];
+    const traits = Array.isArray(info.traits) ? info.traits : [];
+
+    const disabledList = Array.isArray(p.disabled) ? p.disabled : [];
 
     const violentDisabled =
-        p.disabled?.some(d => typeof d === "string" && d.toLowerCase().includes("насили")) ?? false;
+        disabledList.some(d => typeof d === "string" && d.toLowerCase().includes("насили")) ?? false;
 
     const leftHtml = [];
 
     if (p.gender) leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
     if (p.age) leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
     if (p.xenotype) leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
-    if (p.faction) leftHtml.push(`<div><b>Фракция:</b> ${p.faction}</div>`);
-    if (p.origin) leftHtml.push(`<div><b>Происхождение:</b> ${p.origin}</div>`);
-    if (p.childhood) leftHtml.push(`<div><b>Детство:</b> ${p.childhood}</div>`);
-    if (p.adulthood) leftHtml.push(`<div><b>Взрослая жизнь:</b> ${p.adulthood}</div>`);
 
     if (traits.length) {
         leftHtml.push(`<h3>Черты:</h3>`);
         leftHtml.push(traits.map(t => `<div>[${t}]</div>`).join(""));
     }
 
-    if (p.disabled?.length) {
-        const disabledClean = p.disabled.filter(d => d.trim() !== "");
-        if (disabledClean.length) {
-            leftHtml.push(`<h3>Недоступные работы:</h3>`);
-            leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
-        }
+    // 🔥 Исправлено: фильтрация только строк
+    const disabledClean = disabledList.filter(d => typeof d === "string" && d.trim() !== "");
+
+    if (disabledClean.length) {
+        leftHtml.push(`<h3>Недоступные работы:</h3>`);
+        leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
     }
 
     const skillsHtml = Object.entries(skills)
