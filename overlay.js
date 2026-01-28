@@ -1,5 +1,5 @@
-// overlay.js — версия под Supabase
-console.log("OVERLAY.JS + SUPABASE v3");
+// overlay.js — стабильная версия под Supabase
+console.log("OVERLAY.JS + SUPABASE v4 (stable)");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -105,10 +105,18 @@ async function loadPawnInfo(user) {
 function updatePawnInfo(info) {
     if (!info) return;
 
+    // Защита от отсутствующих полей
+    info.needs ??= {};
+    info.healthParts ??= [];
+    info.persona ??= {};
+    info.skills ??= {};
+    info.passions ??= {};
+    info.disabledSkills ??= [];
+
     document.querySelector("#pawn-name").textContent = info.user;
 
     // Портрет
-    if (info.portrait) {
+    if (info.portrait && info.portrait.length > 10) {
         const portrait = document.querySelector(".portrait-inner");
         portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
         portrait.style.backgroundSize = "cover";
@@ -169,7 +177,25 @@ function setBar(selector, percent) {
 }
 
 // ===============================
-// АВТО-ОБНОВЛЕНИЕ ПЕШКИ
+// REALTIME: ТОЛЬКО UPDATE (без мигания)
+// ===============================
+
+supabase
+    .channel("pawns-realtime")
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pawns" }, payload => {
+        if (!currentPawn) return;
+        if (!payload.new) return;
+
+        if (payload.new.user.toLowerCase() === currentPawn.toLowerCase()) {
+            updatePawnInfo(payload.new);
+        }
+
+        loadPawnList();
+    })
+    .subscribe();
+
+// ===============================
+// АВТО-ОБНОВЛЕНИЕ (резервное)
 // ===============================
 
 setInterval(() => {
@@ -177,23 +203,6 @@ setInterval(() => {
     loadPawnInfo(currentPawn);
     loadBalance(currentPawn);
 }, 2000);
-
-// ===============================
-// REALTIME: ОБНОВЛЕНИЕ ПЕШЕК В РЕАЛЬНОМ ВРЕМЕНИ
-// ===============================
-
-supabase
-    .channel("pawns-realtime")
-    .on("postgres_changes", { event: "*", schema: "public", table: "pawns" }, payload => {
-        if (!currentPawn) return;
-
-        if (payload.new?.user?.toLowerCase() === currentPawn.toLowerCase()) {
-            updatePawnInfo(payload.new);
-        }
-
-        loadPawnList();
-    })
-    .subscribe();
 
 // ===============================
 // ЗАПУСК
