@@ -1,21 +1,18 @@
-// health.js — финальная версия
+// health.js — вкладка "Здоровье"
 
 export function renderHealth(info) {
     const container = document.querySelector("#tab-health");
     if (!container) return;
 
-    if (!info || !info.found) {
+    if (!info) {
         container.innerHTML = "Пешка не найдена";
         return;
     }
 
-    const pain = info.pain;
+    const pain = info.pain || "";
     const capacities = info.capacities || {};
     const parts = info.healthParts || [];
 
-    // ------------------------------
-    // ЛЕВАЯ КОЛОНКА
-    // ------------------------------
     const left = [];
 
     if (pain) {
@@ -26,16 +23,13 @@ export function renderHealth(info) {
         .map(([name, val]) => `
             <div style="margin-bottom:8px; display:flex; justify-content:space-between;">
                 <span>${name}</span>
-                <span>${Math.round(val * 100)}%</span>
+                <span>${Math.round((val ?? 0) * 100)}%</span>
             </div>
         `)
         .join("");
 
     left.push(capsHtml);
 
-    // ------------------------------
-    // НОРМАЛИЗАЦИЯ
-    // ------------------------------
     const normalized = parts.map(h => ({
         part: h.part && h.part.trim() !== "" ? h.part : "Все тело",
         hediff: h.hediff,
@@ -43,9 +37,6 @@ export function renderHealth(info) {
         prosthetic: h.prosthetic
     }));
 
-    // ------------------------------
-    // ПРОТЕЗЫ: определяем верхние части
-    // ------------------------------
     const prostheticByPart = new Map();
     for (const h of normalized) {
         if (!h.prosthetic) continue;
@@ -92,12 +83,7 @@ export function renderHealth(info) {
         if (!hidden) upperProstheticParts.add(partA);
     }
 
-    // ------------------------------
-    // ФИЛЬТРАЦИЯ
-    // ------------------------------
     const filtered = normalized.filter(h => {
-        const p = h.part.toLowerCase();
-
         if (h.prosthetic && !upperProstheticParts.has(h.part)) return false;
 
         for (const up of upperProstheticParts) {
@@ -113,18 +99,12 @@ export function renderHealth(info) {
         return true;
     });
 
-    // ------------------------------
-    // ГРУППИРОВКА
-    // ------------------------------
     const grouped = {};
     for (const h of filtered) {
         if (!grouped[h.part]) grouped[h.part] = [];
         grouped[h.part].push(h);
     }
 
-    // ------------------------------
-    // СОРТИРОВКА
-    // ------------------------------
     const order = [
         "Все тело",
         "Голова", "Череп", "Лицо", "Шея",
@@ -145,9 +125,6 @@ export function renderHealth(info) {
         return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
     });
 
-    // ------------------------------
-    // РЕНДЕР
-    // ------------------------------
     let right = "";
 
     for (const part of sortedParts) {
