@@ -1,14 +1,10 @@
 // overlay.js — стабильная версия под Supabase
-console.log("OVERLAY.JS + SUPABASE FINAL v2");
+console.log("OVERLAY.JS + SUPABASE FINAL v3");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
 import { renderNeeds } from "./needs.js";
 import { renderHealth } from "./health.js";
-
-// ===============================
-// SUPABASE
-// ===============================
 
 const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
@@ -27,8 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const tab = btn.dataset.tab;
 
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const target = document.querySelector('#tab-' + tab);
-            if (target) target.classList.add('active');
+            document.querySelector('#tab-' + tab).classList.add('active');
         });
     });
 
@@ -126,14 +121,8 @@ function normalizeHealthPercent(value) {
 }
 
 function updatePawnInfo(info) {
-    // ===============================
-    // КРИТИЧЕСКОЕ: помечаем пешку найденной
-    // ===============================
     info.found = true;
 
-    // ===============================
-    // JSON-поля
-    // ===============================
     info.persona = tryParse(info.persona, {});
     info.needs = tryParse(info.needs, {});
     info.healthParts = tryParse(info.healthParts, []);
@@ -146,7 +135,6 @@ function updatePawnInfo(info) {
 
     document.querySelector("#pawn-name").textContent = info.user;
 
-    // Портрет
     if (info.portrait && info.portrait.length > 10) {
         const portrait = document.querySelector(".portrait-inner");
         portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
@@ -154,7 +142,6 @@ function updatePawnInfo(info) {
         portrait.style.backgroundPosition = "center";
     }
 
-    // Полоски
     const health = normalizeHealthPercent(info.healthSummary);
     setBar("#pawn-health-fill", health);
 
@@ -162,7 +149,6 @@ function updatePawnInfo(info) {
     if (mood <= 1) mood *= 100;
     setBar("#pawn-mood-fill", mood);
 
-    // Вкладки
     renderPersona(info);
     renderNeeds(info);
     renderHealth(info);
