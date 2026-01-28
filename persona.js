@@ -15,6 +15,24 @@ const skillNamesRu = {
     Intellectual: "Умственный труд"
 };
 
+// соответствие disabled → навыки
+const disabledToSkills = {
+    "врач": ["Medicine"],
+    "надзор": ["Social"],
+    "насили": ["Shooting", "Melee"]
+};
+
+function isSkillBlocked(skillName, disabledList) {
+    const lower = disabledList.map(d => d.toLowerCase());
+
+    for (const [key, skills] of Object.entries(disabledToSkills)) {
+        if (lower.some(d => d.includes(key))) {
+            if (skills.includes(skillName)) return true;
+        }
+    }
+    return false;
+}
+
 export function renderPersona(info) {
     const container = document.querySelector("#tab-persona");
     if (!container) return;
@@ -28,15 +46,19 @@ export function renderPersona(info) {
     const p = info.persona && typeof info.persona === "object" ? info.persona : {};
     const skills = info.skills && typeof info.skills === "object" ? info.skills : {};
     const passions = info.passions && typeof info.passions === "object" ? info.passions : {};
-    const traits = Array.isArray(info.traits) ? info.traits.filter(t => typeof t === "string") : [];
-
-    // disabled может содержать null, undefined, объекты, числа — чистим
-    const disabledList = Array.isArray(p.disabled)
-        ? p.disabled.filter(d => typeof d === "string" && d.trim() !== "")
+    const traits = Array.isArray(info.traits)
+        ? info.traits.filter(t => typeof t === "string")
         : [];
 
-    const violentDisabled =
-        disabledList.some(d => d.toLowerCase().includes("насили")) ?? false;
+    // disabled может содержать null, undefined, объекты, числа — чистим
+    const rawDisabled = Array.isArray(p.disabled) ? p.disabled : [];
+    const disabledClean = rawDisabled.reduce((acc, d) => {
+        if (typeof d === "string") {
+            const t = d.trim();
+            if (t !== "") acc.push(t);
+        }
+        return acc;
+    }, []);
 
     const leftHtml = [];
 
@@ -49,22 +71,21 @@ export function renderPersona(info) {
         leftHtml.push(traits.map(t => `<div>[${t}]</div>`).join(""));
     }
 
-    if (disabledList.length) {
+    if (disabledClean.length) {
         leftHtml.push(`<h3>Недоступные работы:</h3>`);
-        leftHtml.push(disabledList.map(d => `<div>[${d}]</div>`).join(""));
+        leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
     }
 
     // РЕНДЕР НАВЫКОВ
     const skillsHtml = Object.entries(skills)
-        .filter(([_, lvl]) => typeof lvl === "number") // защита
+        .filter(([_, lvl]) => typeof lvl === "number")
         .map(([name, lvl]) => {
-            const isViolenceSkill = (name === "Shooting" || name === "Melee");
-            const isBlocked = violentDisabled && isViolenceSkill;
+            const blocked = isSkillBlocked(name, disabledClean);
 
-            const displayValue = isBlocked ? "—" : lvl;
+            const displayValue = blocked ? "—" : lvl;
 
             const passion =
-                isBlocked
+                blocked
                     ? ""
                     : passions[name] === 1 ? "🔥"
                     : passions[name] === 2 ? "🔥🔥"
