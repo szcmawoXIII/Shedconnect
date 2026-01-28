@@ -1,55 +1,126 @@
-console.log("OVERLAY.JS + SUPABASE v6 (final)");
+// overlay.js
+// Главный контроллер интерфейса
+console.log("OVERLAY.JS REAL FILE LOADED v3");
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
 import { renderNeeds } from "./needs.js";
 import { renderHealth } from "./health.js";
 
-const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentPawn = null;
 
 // ===============================
-// DOM INIT
+// ЭКОНОМИКА (localStorage)
 // ===============================
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('#tabs button').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const target = document.querySelector('#tab-' + tab);
-            if (target) target.classList.add('active');
-        });
-    });
 
-    document.querySelector('#tab-persona')?.classList.add('active');
-    document.querySelector("#refresh-list")?.addEventListener("click", loadPawnList);
-    loadPawnList();
+function loadBalance(user) {
+    if (!user) return 0;
+    const raw = localStorage.getItem("balances");
+    if (!raw) return 0;
+
+    try {
+        const data = JSON.parse(raw);
+        return data[user] ?? 0;
+    } catch {
+        return 0;
+    }
+}
+
+function saveBalance(user, amount) {
+    if (!user) return;
+    const raw = localStorage.getItem("balances");
+    const data = raw ? JSON.parse(raw) : {};
+
+    data[user] = amount;
+    localStorage.setItem("balances", JSON.stringify(data));
+}
+
+function addBalance(user, amount) {
+    const current = loadBalance(user);
+    const updated = current + amount;
+    saveBalance(user, updated);
+    return updated;
+}
+
+// ===============================
+// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+// ===============================
+
+document.querySelectorAll('#tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('#tab-' + tab).classList.add('active');
+    });
 });
 
-// ===============================
-// PAWN LIST
-// ===============================
-async function loadPawnList() {
-    const { data, error } = await supabase
-        .from("pawns")
-        .select("user")
-        .order("user", { ascending: true });
+document.querySelector('#tab-persona').classList.add('active');
 
-    if (error) {
-        console.error("Ошибка загрузки списка пешек:", error);
-        return;
+// ===============================
+// WEBSOCKET
+// ===============================
+
+const socket = new WebSocket("ws://localhost:3001");
+
+socket.onopen = () => loadPawnList();
+
+socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+
+    if (data.event === "pawn_info") {
+        updatePawnInfo(data.info);
     }
 
-    renderPawnList(data?.map(x => x.user) ?? []);
+    if (data.event === "all_pawns") {
+        renderPawnList(data.pawns);
+    }
+};
+
+// ===============================
+// КНОПКИ ДЕЙСТВИЙ (исправлено под HTML)
+// ===============================
+
+function updateActionButton(exists, user) {
+    const spawnBtn = document.querySelector("#spawn-pawn-btn");
+    const deleteBtn = document.querySelector("#delete-pawn-btn");
+
+    if (!spawnBtn || !deleteBtn) return;
+
+    if (!exists) {
+        spawnBtn.style.display = "inline-block";
+        deleteBtn.style.display = "none";
+
+        spawnBtn.onclick = () => {
+            socket.send(JSON.stringify({
+                command: "spawn",
+                user
+            }));
+        };
+    } else {
+        spawnBtn.style.display = "none";
+        deleteBtn.style.display = "inline-block";
+
+        deleteBtn.onclick = () => {
+            socket.send(JSON.stringify({
+                command: "execute",
+                user
+            }));
+        };
+    }
 }
+
+// ===============================
+// СПИСОК ПЕШЕК
+// ===============================
+
+function loadPawnList() {
+    socket.send(JSON.stringify({ command: "all_pawns" }));
+}
+
+document.querySelector("#refresh-list").onclick = loadPawnList;
 
 function renderPawnList(list) {
     const container = document.querySelector("#pawn-list");
-    if (!container) return;
-
     container.innerHTML = "";
 
     if (!list || list.length === 0) {
@@ -66,136 +137,101 @@ function renderPawnList(list) {
 }
 
 // ===============================
-// SELECT PAWN
+// ВЫБОР ПЕШКИ
 // ===============================
-async function selectPawn(user) {
-    currentPawn = user;
-    document.querySelector("#pawn-name").textContent = user;
-    document.querySelector("#pawn-balance").textContent = "—";
 
-    await loadPawnInfo(user);
-    await loadBalance(user);
+function selectPawn(user) {
+    currentPawn = user;
+
+    const bal = loadBalance(user);
+    document.querySelector("#pawn-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon">Каты: ${bal}`;
+
+    updateActionButton(false, user);
+
+    socket.send(JSON.stringify({
+        command: "pawn_info",
+        user
+    }));
 }
 
 // ===============================
-// LOAD PAWN INFO
+// ОБНОВЛЕНИЕ ПЕШКИ
 // ===============================
-async function loadPawnInfo(user) {
-    const { data, error } = await supabase
-        .from("pawns")
-        .select("*")
-        .eq("user", user)
-        .single();
 
-    if (error || !data) {
+function updatePawnInfo(info) {
+    if (!info || !info.found) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
+        document.querySelector("#pawn-balance").textContent = "—";
+
+        updateActionButton(false, currentPawn);
         return;
     }
 
-    updatePawnInfo(data);
-}
-
-function normalizeHealthPercent(value) {
-    if (!value) return 0;
-    let raw = String(value).replace("%", "").replace(",", ".");
-    let num = parseFloat(raw);
-    if (isNaN(num)) return 0;
-    return num <= 1 ? num * 100 : num;
-}
-
-function tryParse(obj) {
-    if (typeof obj === "string") {
-        try { return JSON.parse(obj); }
-        catch { return {}; }
-    }
-    return obj ?? {};
-}
-
-function updatePawnInfo(info) {
-    if (!info) return;
-
-    info.persona = tryParse(info.persona);
-    info.needs = tryParse(info.needs);
-    info.healthParts = tryParse(info.healthParts);
-    info.skills = tryParse(info.skills);
-    info.passions = tryParse(info.passions);
-    info.disabledSkills = tryParse(info.disabledSkills);
-    info.capacities = tryParse(info.capacities);
-    info.thoughts = tryParse(info.thoughts);
-
     document.querySelector("#pawn-name").textContent = info.user;
 
-    if (info.portrait && info.portrait.length > 10) {
+    const balance = loadBalance(info.user);
+    document.querySelector("#pawn-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon">Каты: ${balance}`;
+
+    // Портрет пешки
+    if (info.portrait) {
         const portrait = document.querySelector(".portrait-inner");
-        if (portrait) {
-            portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
-            portrait.style.backgroundSize = "cover";
-            portrait.style.backgroundPosition = "center";
-        }
+        portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
+        portrait.style.backgroundSize = "cover";
+        portrait.style.backgroundPosition = "center";
     }
 
-    setBar("#pawn-health-fill", normalizeHealthPercent(info.healthSummary));
-    let mood = info.needs?.Mood ?? info.needs?.mood ?? 0;
-    setBar("#pawn-mood-fill", mood <= 1 ? mood * 100 : mood);
+    // Полоски
+    let health = parseFloat(info.healthSummary?.replace("%", "").replace(",", ".")) || 0;
+    setBar("#pawn-health-fill", health);
 
+    let mood = info.needs?.Mood ?? info.needs?.mood ?? 0;
+    setBar("#pawn-mood-fill", mood * 100);
+
+    // Вкладки
     renderPersona(info);
     renderNeeds(info);
     renderHealth(info);
+
+    updateActionButton(!!info.exists, info.user);
 }
 
 // ===============================
-// BALANCE
+// ХЕЛПЕР ДЛЯ ПОЛОСОК
 // ===============================
-async function loadBalance(user) {
-    const { data, error } = await supabase
-        .from("balances")
-        .select("balance")
-        .eq("user", user)
-        .single();
 
-    if (error || !data) return;
-    updateBalance({ user, balance: data.balance });
-}
-
-function updateBalance(data) {
-    if (!data || !data.user || !currentPawn) return;
-    if (data.user.toLowerCase() !== currentPawn.toLowerCase()) return;
-
-    const el = document.querySelector("#pawn-balance");
-    if (!el) return;
-
-    el.innerHTML = `<img src="img/catcoin.png" class="kat-icon">Каты: ${data.balance}`;
-}
-
-// ===============================
-// BARS
-// ===============================
 function setBar(selector, percent) {
     const el = document.querySelector(selector);
     if (!el) return;
-    const clamped = Math.max(0, Math.min(100, percent || 0));
+
+    const clamped = Math.max(0, Math.min(100, percent));
     el.style.width = clamped + "%";
 }
 
 // ===============================
-// REALTIME
+// АВТО-ОБНОВЛЕНИЕ ПЕШКИ
 // ===============================
-supabase
-    .channel("pawns-realtime")
-    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pawns" }, payload => {
-        if (!currentPawn || !payload.new) return;
-        if (payload.new.user?.toLowerCase() === currentPawn.toLowerCase()) {
-            updatePawnInfo(payload.new);
-        }
-        loadPawnList();
-    })
-    .subscribe();
 
-// ===============================
-// AUTO REFRESH
-// ===============================
 setInterval(() => {
     if (!currentPawn) return;
-    loadPawnInfo(currentPawn);
-    loadBalance(currentPawn);
+    if (socket.readyState !== WebSocket.OPEN) return;
+
+    socket.send(JSON.stringify({
+        command: "pawn_info",
+        user: currentPawn
+    }));
 }, 2000);
+
+// ===============================
+// АВТО-НАЧИСЛЕНИЕ 100 КАТОВ В МИНУТУ
+// ===============================
+
+setInterval(() => {
+    if (!currentPawn) return;
+
+    const newBalance = addBalance(currentPawn, 100);
+    document.querySelector("#pawn-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon">Каты: ${newBalance}`;
+
+}, 60 * 1000); // 1 минута
