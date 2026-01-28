@@ -1,212 +1,41 @@
-// health.js — финальная версия
-
 export function renderHealth(info) {
-    const container = document.querySelector("#tab-health");
-    if (!container) return;
+    const root = document.getElementById("health");
+    if (!root) return;
 
-    if (!info || !info.found) {
-        container.innerHTML = "Пешка не найдена";
-        return;
-    }
+    const parts = info.healthParts;
 
-    const pain = info.pain;
-    const capacities = info.capacities || {};
-    const parts = info.healthParts || [];
-
-    // ------------------------------
-    // ЛЕВАЯ КОЛОНКА
-    // ------------------------------
-    const left = [];
-
-    if (pain) {
-        left.push(`<div style="margin-bottom:10px;"><b>Боль:</b> ${pain}</div>`);
-    }
-
-    const capsHtml = Object.entries(capacities)
-        .map(([name, val]) => `
-            <div style="margin-bottom:8px; display:flex; justify-content:space-between;">
-                <span>${name}</span>
-                <span>${Math.round(val * 100)}%</span>
-            </div>
-        `)
-        .join("");
-
-    left.push(capsHtml);
-
-    // ------------------------------
-    // НОРМАЛИЗАЦИЯ
-    // ------------------------------
-    const normalized = parts.map(h => ({
-        part: h.part && h.part.trim() !== "" ? h.part : "Все тело",
-        hediff: h.hediff,
-        bleeding: h.bleeding,
-        prosthetic: h.prosthetic
-    }));
-
-    // ------------------------------
-    // ПРОТЕЗЫ: определяем верхние части
-    // ------------------------------
-    const prostheticByPart = new Map();
-    for (const h of normalized) {
-        if (!h.prosthetic) continue;
-        prostheticByPart.set(h.part, h);
-    }
-
-    const hierarchy = [
-        "рука",
-        "предплеч",
-        "кисть",
-        "палец",
-        "бедро",
-        "голень",
-        "стопа"
-    ];
-
-    function partDepth(partName) {
-        const p = partName.toLowerCase();
-        for (let i = 0; i < hierarchy.length; i++) {
-            if (p.includes(hierarchy[i])) return i;
-        }
-        return 999;
-    }
-
-    const upperProstheticParts = new Set();
-    for (const [partA] of prostheticByPart.entries()) {
-        let hidden = false;
-        const depthA = partDepth(partA);
-
-        for (const [partB] of prostheticByPart.entries()) {
-            if (partA === partB) continue;
-            const depthB = partDepth(partB);
-
-            if (depthB < depthA) {
-                const sideA = partA.split(" ")[0];
-                const sideB = partB.split(" ")[0];
-                if (sideA === sideB) {
-                    hidden = true;
-                    break;
-                }
-            }
-        }
-
-        if (!hidden) upperProstheticParts.add(partA);
-    }
-
-    // ------------------------------
-    // ФИЛЬТРАЦИЯ
-    // ------------------------------
-    const filtered = normalized.filter(h => {
-        const p = h.part.toLowerCase();
-
-        if (h.prosthetic && !upperProstheticParts.has(h.part)) return false;
-
-        for (const up of upperProstheticParts) {
-            const side = up.split(" ")[0];
-            if (!h.part.startsWith(side)) continue;
-
-            const dUp = partDepth(up);
-            const dCur = partDepth(h.part);
-
-            if (dCur > dUp) return false;
-        }
-
-        return true;
-    });
-
-    // ------------------------------
-    // ГРУППИРОВКА
-    // ------------------------------
     const grouped = {};
-    for (const h of filtered) {
+    for (const h of parts) {
         if (!grouped[h.part]) grouped[h.part] = [];
         grouped[h.part].push(h);
     }
 
-    // ------------------------------
-    // СОРТИРОВКА
-    // ------------------------------
-    const order = [
-        "Все тело",
-        "Голова", "Череп", "Лицо", "Шея",
-        "Правое ухо", "Левое ухо",
-        "Правый глаз", "Левый глаз",
-        "Правая рука", "Левая рука",
-        "Правое предплечье", "Левое предплечье",
-        "Правая кисть", "Левая кисть",
-        "Правый палец", "Левый палец",
-        "Правое бедро", "Левое бедро",
-        "Правая голень", "Левая голень",
-        "Правая стопа", "Левая стопа"
-    ];
+    const sortedParts = Object.keys(grouped).sort();
 
-    const sortedParts = Object.keys(grouped).sort((a, b) => {
-        const ia = order.findIndex(x => a.startsWith(x));
-        const ib = order.findIndex(x => b.startsWith(x));
-        return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-    });
+    root.innerHTML = `
+        <div class="health-block">
+            <div class="health-summary">
+                <b>Общее здоровье:</b> ${info.healthSummary}
+            </div>
 
-    // ------------------------------
-    // РЕНДЕР
-    // ------------------------------
-    let right = "";
+            <div class="health-pain">
+                <b>Боль:</b> ${info.pain}
+            </div>
 
-    for (const part of sortedParts) {
-        const list = grouped[part];
-
-        if (part === "Все тело") {
-            const first = list[0];
-            const bleed = first.bleeding ? " 💧" : "";
-            right += `<div style="margin-bottom:4px;"><b>Все тело:</b> ${first.hediff}${bleed}</div>`;
-
-            for (let i = 1; i < list.length; i++) {
-                const h = list[i];
-                const bleed2 = h.bleeding ? " 💧" : "";
-                right += `
-                    <div style="margin-left:25px; margin-bottom:3px;">
-                        ${h.hediff}${bleed2}
+            ${sortedParts.map(part => `
+                <div class="health-part">
+                    <div class="health-part-title">${part}</div>
+                    <div class="health-part-list">
+                        ${grouped[part].map(h => `
+                            <div class="health-row">
+                                <span class="health-name">${h.hediff}</span>
+                                ${h.bleeding ? `<span class="health-bleeding">Кровотечение</span>` : ""}
+                                ${h.prosthetic ? `<span class="health-prosthetic">Протез</span>` : ""}
+                            </div>
+                        `).join("")}
                     </div>
-                `;
-            }
-            continue;
-        }
-
-        const woundGroups = {};
-        for (const h of list) {
-            const key = h.hediff + "|" + h.bleeding;
-            if (!woundGroups[key]) woundGroups[key] = { ...h, count: 0 };
-            woundGroups[key].count++;
-        }
-
-        const wounds = Object.values(woundGroups);
-
-        const first = wounds[0];
-        const bleed = first.bleeding ? "💧" : "";
-        const count = first.count > 1 ? ` x${first.count}` : "";
-
-        right += `<div style="margin-bottom:4px;"><b>${part}:</b> ${first.hediff}${count} ${bleed}</div>`;
-
-        for (let i = 1; i < wounds.length; i++) {
-            const w = wounds[i];
-            const bleed2 = w.bleeding ? "💧" : "";
-            const count2 = w.count > 1 ? ` x${w.count}` : "";
-
-            right += `
-                <div style="margin-left:25px; margin-bottom:3px;">
-                    ${w.hediff}${count2} ${bleed2}
                 </div>
-            `;
-        }
-    }
-
-    container.innerHTML = `
-        <div style="display:flex; gap:40px;">
-            <div style="flex:1; font-size:15px;">
-                ${left.join("")}
-            </div>
-
-            <div style="flex:1.3; font-size:15px;">
-                ${right}
-            </div>
+            `).join("")}
         </div>
     `;
 }
