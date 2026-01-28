@@ -1,53 +1,37 @@
-// overlay.js — стабильная версия под Supabase
-console.log("OVERLAY.JS + SUPABASE v5 (stable)");
+console.log("OVERLAY.JS + SUPABASE v6 (final)");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
 import { renderNeeds } from "./needs.js";
 import { renderHealth } from "./health.js";
 
-// ===============================
-// НАСТРОЙКИ SUPABASE
-// ===============================
-
 const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 let currentPawn = null;
 
 // ===============================
-// ИНИЦИАЛИЗАЦИЯ DOM (вкладки и кнопки) ПОСЛЕ ЗАГРУЗКИ
+// DOM INIT
 // ===============================
-
 document.addEventListener("DOMContentLoaded", () => {
-    // Переключение вкладок
     document.querySelectorAll('#tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
-
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             const target = document.querySelector('#tab-' + tab);
             if (target) target.classList.add('active');
         });
     });
 
-    const firstTab = document.querySelector('#tab-persona');
-    if (firstTab) firstTab.classList.add('active');
-
-    // Кнопка обновления списка
-    const refreshBtn = document.querySelector("#refresh-list");
-    if (refreshBtn) refreshBtn.onclick = loadPawnList;
-
-    // Стартовая загрузка
+    document.querySelector('#tab-persona')?.classList.add('active');
+    document.querySelector("#refresh-list")?.addEventListener("click", loadPawnList);
     loadPawnList();
 });
 
 // ===============================
-// ЗАГРУЗКА СПИСКА ПЕШЕК
+// PAWN LIST
 // ===============================
-
 async function loadPawnList() {
     const { data, error } = await supabase
         .from("pawns")
@@ -82,26 +66,20 @@ function renderPawnList(list) {
 }
 
 // ===============================
-// ВЫБОР ПЕШКИ
+// SELECT PAWN
 // ===============================
-
 async function selectPawn(user) {
     currentPawn = user;
-
-    const nameEl = document.querySelector("#pawn-name");
-    const balEl = document.querySelector("#pawn-balance");
-
-    if (nameEl) nameEl.textContent = user;
-    if (balEl) balEl.textContent = "—";
+    document.querySelector("#pawn-name").textContent = user;
+    document.querySelector("#pawn-balance").textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
 }
 
 // ===============================
-// ЗАГРУЗКА ИНФОРМАЦИИ О ПЕШКЕ
+// LOAD PAWN INFO
 // ===============================
-
 async function loadPawnInfo(user) {
     const { data, error } = await supabase
         .from("pawns")
@@ -110,43 +88,43 @@ async function loadPawnInfo(user) {
         .single();
 
     if (error || !data) {
-        const nameEl = document.querySelector("#pawn-name");
-        if (nameEl) nameEl.textContent = "Пешка не найдена";
+        document.querySelector("#pawn-name").textContent = "Пешка не найдена";
         return;
     }
 
     updatePawnInfo(data);
 }
 
-function normalizeHealthPercent(healthSummary) {
-    if (!healthSummary) return 0;
+function normalizeHealthPercent(value) {
+    if (!value) return 0;
+    let raw = String(value).replace("%", "").replace(",", ".");
+    let num = parseFloat(raw);
+    if (isNaN(num)) return 0;
+    return num <= 1 ? num * 100 : num;
+}
 
-    let raw = String(healthSummary).trim().replace("%", "").replace(",", ".");
-    let value = parseFloat(raw);
-
-    if (isNaN(value)) return 0;
-
-    // Если пришло 0–1 → считаем, что это доля и умножаем на 100
-    if (value <= 1) value *= 100;
-
-    return Math.max(0, Math.min(100, value));
+function tryParse(obj) {
+    if (typeof obj === "string") {
+        try { return JSON.parse(obj); }
+        catch { return {}; }
+    }
+    return obj ?? {};
 }
 
 function updatePawnInfo(info) {
     if (!info) return;
 
-    // Защита от отсутствующих полей
-    info.needs ??= {};
-    info.healthParts ??= [];
-    info.persona ??= {};
-    info.skills ??= {};
-    info.passions ??= {};
-    info.disabledSkills ??= [];
+    info.persona = tryParse(info.persona);
+    info.needs = tryParse(info.needs);
+    info.healthParts = tryParse(info.healthParts);
+    info.skills = tryParse(info.skills);
+    info.passions = tryParse(info.passions);
+    info.disabledSkills = tryParse(info.disabledSkills);
+    info.capacities = tryParse(info.capacities);
+    info.thoughts = tryParse(info.thoughts);
 
-    const nameEl = document.querySelector("#pawn-name");
-    if (nameEl) nameEl.textContent = info.user;
+    document.querySelector("#pawn-name").textContent = info.user;
 
-    // Портрет
     if (info.portrait && info.portrait.length > 10) {
         const portrait = document.querySelector(".portrait-inner");
         if (portrait) {
@@ -156,24 +134,18 @@ function updatePawnInfo(info) {
         }
     }
 
-    // Полоски
-    const healthPercent = normalizeHealthPercent(info.healthSummary);
-    setBar("#pawn-health-fill", healthPercent);
-
+    setBar("#pawn-health-fill", normalizeHealthPercent(info.healthSummary));
     let mood = info.needs?.Mood ?? info.needs?.mood ?? 0;
-    if (mood <= 1) mood = mood * 100;
-    setBar("#pawn-mood-fill", mood);
+    setBar("#pawn-mood-fill", mood <= 1 ? mood * 100 : mood);
 
-    // Вкладки
     renderPersona(info);
     renderNeeds(info);
     renderHealth(info);
 }
 
 // ===============================
-// ЗАГРУЗКА БАЛАНСА
+// BALANCE
 // ===============================
-
 async function loadBalance(user) {
     const { data, error } = await supabase
         .from("balances")
@@ -182,14 +154,11 @@ async function loadBalance(user) {
         .single();
 
     if (error || !data) return;
-
     updateBalance({ user, balance: data.balance });
 }
 
 function updateBalance(data) {
-    if (!data || !data.user) return;
-    if (!currentPawn) return;
-
+    if (!data || !data.user || !currentPawn) return;
     if (data.user.toLowerCase() !== currentPawn.toLowerCase()) return;
 
     const el = document.querySelector("#pawn-balance");
@@ -199,39 +168,32 @@ function updateBalance(data) {
 }
 
 // ===============================
-// ХЕЛПЕР ДЛЯ ПОЛОСОК
+// BARS
 // ===============================
-
 function setBar(selector, percent) {
     const el = document.querySelector(selector);
     if (!el) return;
-
     const clamped = Math.max(0, Math.min(100, percent || 0));
     el.style.width = clamped + "%";
 }
 
 // ===============================
-// REALTIME: ТОЛЬКО UPDATE (без мигания)
+// REALTIME
 // ===============================
-
 supabase
     .channel("pawns-realtime")
     .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pawns" }, payload => {
-        if (!currentPawn) return;
-        if (!payload.new) return;
-
+        if (!currentPawn || !payload.new) return;
         if (payload.new.user?.toLowerCase() === currentPawn.toLowerCase()) {
             updatePawnInfo(payload.new);
         }
-
         loadPawnList();
     })
     .subscribe();
 
 // ===============================
-// АВТО-ОБНОВЛЕНИЕ (резервное)
+// AUTO REFRESH
 // ===============================
-
 setInterval(() => {
     if (!currentPawn) return;
     loadPawnInfo(currentPawn);
