@@ -1,5 +1,5 @@
 // overlay.js — стабильная версия под Supabase
-console.log("OVERLAY.JS + SUPABASE FINAL v3");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v1");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -13,17 +13,17 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentPawn = null;
 
-// ===============================
+// -------------------------------
 // ВКЛАДКИ
-// ===============================
-
+// -------------------------------
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('#tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
 
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector('#tab-' + tab).classList.add('active');
+            const target = document.querySelector('#tab-' + tab);
+            if (target) target.classList.add('active');
         });
     });
 
@@ -34,10 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPawnList();
 });
 
-// ===============================
+// -------------------------------
 // СПИСОК ПЕШЕК
-// ===============================
-
+// -------------------------------
 async function loadPawnList() {
     const { data, error } = await supabase
         .from("pawns")
@@ -54,6 +53,8 @@ async function loadPawnList() {
 
 function renderPawnList(list) {
     const container = document.querySelector("#pawn-list");
+    if (!container) return;
+
     container.innerHTML = "";
 
     if (!list || list.length === 0) {
@@ -69,10 +70,9 @@ function renderPawnList(list) {
     });
 }
 
-// ===============================
+// -------------------------------
 // ВЫБОР ПЕШКИ
-// ===============================
-
+// -------------------------------
 async function selectPawn(user) {
     currentPawn = user;
 
@@ -83,10 +83,9 @@ async function selectPawn(user) {
     await loadBalance(user);
 }
 
-// ===============================
-// ЗАГРУЗКА ИНФОРМАЦИИ О ПЕШКЕ
-// ===============================
-
+// -------------------------------
+// ЗАГРУЗКА ПЕШКИ
+// -------------------------------
 async function loadPawnInfo(user) {
     const { data, error } = await supabase
         .from("pawns")
@@ -97,10 +96,20 @@ async function loadPawnInfo(user) {
     if (error || !data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
         document.querySelector("#pawn-balance").textContent = "—";
+        clearTabs();
         return;
     }
 
     updatePawnInfo(data);
+}
+
+function clearTabs() {
+    const p = document.querySelector("#tab-persona");
+    const n = document.querySelector("#tab-needs");
+    const h = document.querySelector("#tab-health");
+    if (p) p.innerHTML = "";
+    if (n) n.innerHTML = "";
+    if (h) h.innerHTML = "";
 }
 
 function tryParse(obj, fallback) {
@@ -121,25 +130,28 @@ function normalizeHealthPercent(value) {
 }
 
 function updatePawnInfo(info) {
-    info.found = true;
-
-    info.persona = tryParse(info.persona, {});
-    info.needs = tryParse(info.needs, {});
-    info.healthParts = tryParse(info.healthParts, []);
-    info.skills = tryParse(info.skills, {});
-    info.passions = tryParse(info.passions, {});
-    info.disabledSkills = tryParse(info.disabledSkills, []);
-    info.capacities = tryParse(info.capacities, {});
-    info.thoughts = tryParse(info.thoughts, []);
-    info.traits = tryParse(info.traits, []);
+    // Жёсткая нормализация структуры
+    info.persona = tryParse(info.persona, {}) || {};
+    info.needs = tryParse(info.needs, {}) || {};
+    info.healthParts = tryParse(info.healthParts, []) || [];
+    info.skills = tryParse(info.skills, {}) || {};
+    info.passions = tryParse(info.passions, {}) || {};
+    info.disabledSkills = tryParse(info.disabledSkills, []) || [];
+    info.capacities = tryParse(info.capacities, {}) || {};
+    info.thoughts = tryParse(info.thoughts, []) || [];
+    info.traits = tryParse(info.traits, []) || [];
+    info.pain = info.pain ?? "";
+    info.healthSummary = info.healthSummary ?? "0";
 
     document.querySelector("#pawn-name").textContent = info.user;
 
     if (info.portrait && info.portrait.length > 10) {
         const portrait = document.querySelector(".portrait-inner");
-        portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
-        portrait.style.backgroundSize = "cover";
-        portrait.style.backgroundPosition = "center";
+        if (portrait) {
+            portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
+            portrait.style.backgroundSize = "cover";
+            portrait.style.backgroundPosition = "center";
+        }
     }
 
     const health = normalizeHealthPercent(info.healthSummary);
@@ -149,15 +161,15 @@ function updatePawnInfo(info) {
     if (mood <= 1) mood *= 100;
     setBar("#pawn-mood-fill", mood);
 
+    // Критично: просто вызываем рендеры, без found
     renderPersona(info);
     renderNeeds(info);
     renderHealth(info);
 }
 
-// ===============================
+// -------------------------------
 // БАЛАНС
-// ===============================
-
+// -------------------------------
 async function loadBalance(user) {
     const { data, error } = await supabase
         .from("balances")
@@ -181,10 +193,9 @@ function updateBalance(data) {
         `<img src="img/catcoin.png" class="kat-icon">Каты: ${data.balance}`;
 }
 
-// ===============================
+// -------------------------------
 // ПОЛОСЫ
-// ===============================
-
+// -------------------------------
 function setBar(selector, percent) {
     const el = document.querySelector(selector);
     if (!el) return;
@@ -192,10 +203,9 @@ function setBar(selector, percent) {
     el.style.width = clamped + "%";
 }
 
-// ===============================
+// -------------------------------
 // REALTIME
-// ===============================
-
+// -------------------------------
 supabase
     .channel("pawns-realtime")
     .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pawns" }, payload => {
@@ -214,10 +224,6 @@ supabase
         updateBalance(payload.new);
     })
     .subscribe();
-
-// ===============================
-// РЕЗЕРВНОЕ АВТО-ОБНОВЛЕНИЕ
-// ===============================
 
 setInterval(() => {
     if (!currentPawn) return;
