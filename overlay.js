@@ -1,5 +1,5 @@
 // overlay.js — стабильная версия под Supabase
-console.log("OVERLAY.JS + SUPABASE v4 (stable)");
+console.log("OVERLAY.JS + SUPABASE v5 (stable)");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -18,19 +18,31 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentPawn = null;
 
 // ===============================
-// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+// ИНИЦИАЛИЗАЦИЯ DOM (вкладки и кнопки) ПОСЛЕ ЗАГРУЗКИ
 // ===============================
 
-document.querySelectorAll('#tabs button').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const tab = btn.dataset.tab;
+document.addEventListener("DOMContentLoaded", () => {
+    // Переключение вкладок
+    document.querySelectorAll('#tabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
 
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelector('#tab-' + tab).classList.add('active');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const target = document.querySelector('#tab-' + tab);
+            if (target) target.classList.add('active');
+        });
     });
-});
 
-document.querySelector('#tab-persona').classList.add('active');
+    const firstTab = document.querySelector('#tab-persona');
+    if (firstTab) firstTab.classList.add('active');
+
+    // Кнопка обновления списка
+    const refreshBtn = document.querySelector("#refresh-list");
+    if (refreshBtn) refreshBtn.onclick = loadPawnList;
+
+    // Стартовая загрузка
+    loadPawnList();
+});
 
 // ===============================
 // ЗАГРУЗКА СПИСКА ПЕШЕК
@@ -50,10 +62,10 @@ async function loadPawnList() {
     renderPawnList(data?.map(x => x.user) ?? []);
 }
 
-document.querySelector("#refresh-list").onclick = loadPawnList;
-
 function renderPawnList(list) {
     const container = document.querySelector("#pawn-list");
+    if (!container) return;
+
     container.innerHTML = "";
 
     if (!list || list.length === 0) {
@@ -76,8 +88,11 @@ function renderPawnList(list) {
 async function selectPawn(user) {
     currentPawn = user;
 
-    document.querySelector("#pawn-name").textContent = user;
-    document.querySelector("#pawn-balance").textContent = "—";
+    const nameEl = document.querySelector("#pawn-name");
+    const balEl = document.querySelector("#pawn-balance");
+
+    if (nameEl) nameEl.textContent = user;
+    if (balEl) balEl.textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -95,11 +110,26 @@ async function loadPawnInfo(user) {
         .single();
 
     if (error || !data) {
-        document.querySelector("#pawn-name").textContent = "Пешка не найдена";
+        const nameEl = document.querySelector("#pawn-name");
+        if (nameEl) nameEl.textContent = "Пешка не найдена";
         return;
     }
 
     updatePawnInfo(data);
+}
+
+function normalizeHealthPercent(healthSummary) {
+    if (!healthSummary) return 0;
+
+    let raw = String(healthSummary).trim().replace("%", "").replace(",", ".");
+    let value = parseFloat(raw);
+
+    if (isNaN(value)) return 0;
+
+    // Если пришло 0–1 → считаем, что это доля и умножаем на 100
+    if (value <= 1) value *= 100;
+
+    return Math.max(0, Math.min(100, value));
 }
 
 function updatePawnInfo(info) {
@@ -113,22 +143,26 @@ function updatePawnInfo(info) {
     info.passions ??= {};
     info.disabledSkills ??= [];
 
-    document.querySelector("#pawn-name").textContent = info.user;
+    const nameEl = document.querySelector("#pawn-name");
+    if (nameEl) nameEl.textContent = info.user;
 
     // Портрет
     if (info.portrait && info.portrait.length > 10) {
         const portrait = document.querySelector(".portrait-inner");
-        portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
-        portrait.style.backgroundSize = "cover";
-        portrait.style.backgroundPosition = "center";
+        if (portrait) {
+            portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
+            portrait.style.backgroundSize = "cover";
+            portrait.style.backgroundPosition = "center";
+        }
     }
 
     // Полоски
-    let health = parseFloat(info.healthSummary?.replace("%", "").replace(",", ".")) || 0;
-    setBar("#pawn-health-fill", health);
+    const healthPercent = normalizeHealthPercent(info.healthSummary);
+    setBar("#pawn-health-fill", healthPercent);
 
     let mood = info.needs?.Mood ?? info.needs?.mood ?? 0;
-    setBar("#pawn-mood-fill", mood * 100);
+    if (mood <= 1) mood = mood * 100;
+    setBar("#pawn-mood-fill", mood);
 
     // Вкладки
     renderPersona(info);
@@ -172,7 +206,7 @@ function setBar(selector, percent) {
     const el = document.querySelector(selector);
     if (!el) return;
 
-    const clamped = Math.max(0, Math.min(100, percent));
+    const clamped = Math.max(0, Math.min(100, percent || 0));
     el.style.width = clamped + "%";
 }
 
@@ -186,7 +220,7 @@ supabase
         if (!currentPawn) return;
         if (!payload.new) return;
 
-        if (payload.new.user.toLowerCase() === currentPawn.toLowerCase()) {
+        if (payload.new.user?.toLowerCase() === currentPawn.toLowerCase()) {
             updatePawnInfo(payload.new);
         }
 
@@ -203,9 +237,3 @@ setInterval(() => {
     loadPawnInfo(currentPawn);
     loadBalance(currentPawn);
 }, 2000);
-
-// ===============================
-// ЗАПУСК
-// ===============================
-
-loadPawnList();
