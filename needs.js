@@ -1,23 +1,94 @@
+// needs.js
+// Вкладка "Нужды" — сортировка мыслей по moodOffset (от + к -)
+
+const needNamesRu = {
+    Food: "Сытость",
+    Rest: "Сон",
+    Recreation: "Удовлетворённость",
+    Beauty: "Окружение",
+    Comfort: "Комфорт",
+    Outdoors: "Свежий воздух"
+};
+
 export function renderNeeds(info) {
-    const root = document.getElementById("needs");
-    if (!root) return;
+    const container = document.querySelector("#tab-needs");
+    if (!container) return;
 
-    const needs = info.needs;
+    if (!info || !info.found) {
+        container.innerHTML = "Пешка не найдена";
+        return;
+    }
 
-    const sorted = Object.entries(needs)
-        .sort((a, b) => a[1] - b[1]);
+    const needs = info.needs || {};
+    const thoughts = info.thoughts || [];
 
-    root.innerHTML = `
-        <div class="needs-list">
-            ${sorted.map(([name, value]) => `
-                <div class="need-row">
-                    <div class="need-name">${name}</div>
-                    <div class="need-bar">
-                        <div class="need-fill" style="width:${Math.floor(value * 100)}%"></div>
+    // Левая колонка — нужды
+    const needsLeft = Object.entries(needs)
+        .filter(([name]) => needNamesRu[name])
+        .map(([name, val]) => {
+            const ru = needNamesRu[name] || name;
+            const percent = Math.round(val * 100);
+
+            return `
+                <div style="margin-bottom: 10px;">
+                    <div style="font-size: 15px; display:flex; justify-content:space-between;">
+                        <span>${ru}</span>
+                        <span>${percent}%</span>
                     </div>
-                    <div class="need-value">${Math.floor(value * 100)}%</div>
+
+                    <div class="need-bar">
+                        <div class="need-bar-fill" style="width:${percent}%;"></div>
+                    </div>
                 </div>
-            `).join("")}
+            `;
+        })
+        .join("");
+
+    // Группировка мыслей
+    const grouped = {};
+
+    for (const t of thoughts) {
+        const key = t.label.trim().toLowerCase();
+        if (!grouped[key]) {
+            grouped[key] = { label: t.label, total: 0, count: 0 };
+        }
+        grouped[key].total += t.moodOffset;
+        grouped[key].count++;
+    }
+
+    const merged = Object.values(grouped)
+        .filter(t => Math.abs(t.total) > 0.01)
+        .sort((a, b) => b.total - a.total); // сортировка от + к -
+
+    const thoughtsRight = merged
+        .map(t => {
+            const color =
+                t.total > 0 ? "#6aff6a" :
+                t.total < 0 ? "#ff6a6a" :
+                "#cccccc";
+
+            const count = t.count > 1 ? ` x${t.count}` : "";
+
+            return `
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span>${t.label}${count}</span>
+                    <span style="color:${color}; font-weight:bold;">
+                        ${t.total > 0 ? "+" : ""}${t.total}
+                    </span>
+                </div>
+            `;
+        })
+        .join("");
+
+    container.innerHTML = `
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; font-size:15px;">
+                ${needsLeft}
+            </div>
+
+            <div style="flex:1; font-size:15px;">
+                ${thoughtsRight}
+            </div>
         </div>
     `;
 }
