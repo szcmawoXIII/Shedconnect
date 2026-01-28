@@ -15,22 +15,26 @@ const skillNamesRu = {
     Intellectual: "Умственный труд"
 };
 
-// соответствие disabled → навыки
-const disabledToSkills = {
+// соответствие WorkType → Skills (как в RimWorld)
+const workTypeToSkills = {
     "врач": ["Medicine"],
+    "уход": ["Medicine"],
     "надзор": ["Social"],
-    "насили": ["Shooting", "Melee"]
+    "насили": ["Shooting", "Melee"],
+    "квалифицированная": ["Construction", "Mining", "Cooking", "Plants", "Crafting"]
 };
 
-function isSkillBlocked(skillName, disabledList) {
+// определяем, какие навыки должны быть заблокированы
+function getBlockedSkills(disabledList) {
     const lower = disabledList.map(d => d.toLowerCase());
+    const blocked = new Set();
 
-    for (const [key, skills] of Object.entries(disabledToSkills)) {
+    for (const [key, skills] of Object.entries(workTypeToSkills)) {
         if (lower.some(d => d.includes(key))) {
-            if (skills.includes(skillName)) return true;
+            skills.forEach(s => blocked.add(s));
         }
     }
-    return false;
+    return blocked;
 }
 
 export function renderPersona(info) {
@@ -42,7 +46,7 @@ export function renderPersona(info) {
         return;
     }
 
-    // ГАРАНТИРОВАННОЕ ПРИВЕДЕНИЕ ТИПОВ
+    // безопасное приведение типов
     const p = info.persona && typeof info.persona === "object" ? info.persona : {};
     const skills = info.skills && typeof info.skills === "object" ? info.skills : {};
     const passions = info.passions && typeof info.passions === "object" ? info.passions : {};
@@ -50,7 +54,7 @@ export function renderPersona(info) {
         ? info.traits.filter(t => typeof t === "string")
         : [];
 
-    // disabled может содержать null, undefined, объекты, числа — чистим
+    // чистим disabled
     const rawDisabled = Array.isArray(p.disabled) ? p.disabled : [];
     const disabledClean = rawDisabled.reduce((acc, d) => {
         if (typeof d === "string") {
@@ -59,6 +63,9 @@ export function renderPersona(info) {
         }
         return acc;
     }, []);
+
+    // определяем заблокированные навыки
+    const blockedSkills = getBlockedSkills(disabledClean);
 
     const leftHtml = [];
 
@@ -71,16 +78,17 @@ export function renderPersona(info) {
         leftHtml.push(traits.map(t => `<div>[${t}]</div>`).join(""));
     }
 
+    // 🔥 Показываем ровно то, что пришло из RimWorld
     if (disabledClean.length) {
         leftHtml.push(`<h3>Недоступные работы:</h3>`);
         leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
     }
 
-    // РЕНДЕР НАВЫКОВ
+    // рендер навыков
     const skillsHtml = Object.entries(skills)
         .filter(([_, lvl]) => typeof lvl === "number")
         .map(([name, lvl]) => {
-            const blocked = isSkillBlocked(name, disabledClean);
+            const blocked = blockedSkills.has(name);
 
             const displayValue = blocked ? "—" : lvl;
 
