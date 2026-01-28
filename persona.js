@@ -1,5 +1,4 @@
-// persona.js
-// Вкладка "Персона" — без портрета
+// persona.js — вкладка "Персона"
 
 const skillNamesRu = {
     Shooting: "Дальний бой",
@@ -20,7 +19,7 @@ export function renderPersona(info) {
     const container = document.querySelector("#tab-persona");
     if (!container) return;
 
-    if (!info || !info.found) {
+    if (!info) {
         container.innerHTML = "Пешка не найдена";
         return;
     }
@@ -28,20 +27,24 @@ export function renderPersona(info) {
     const p = info.persona || {};
     const skills = info.skills || {};
     const passions = info.passions || {};
+    const traits = info.traits || [];
 
     const violentDisabled =
         p.disabled?.some(d => typeof d === "string" && d.toLowerCase().includes("насили")) ?? false;
 
-    // Левая колонка
     const leftHtml = [];
 
     if (p.gender) leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
     if (p.age) leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
     if (p.xenotype) leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
+    if (p.faction) leftHtml.push(`<div><b>Фракция:</b> ${p.faction}</div>`);
+    if (p.origin) leftHtml.push(`<div><b>Происхождение:</b> ${p.origin}</div>`);
+    if (p.childhood) leftHtml.push(`<div><b>Детство:</b> ${p.childhood}</div>`);
+    if (p.adulthood) leftHtml.push(`<div><b>Взрослая жизнь:</b> ${p.adulthood}</div>`);
 
-    if (info.traits?.length) {
+    if (traits.length) {
         leftHtml.push(`<h3>Черты:</h3>`);
-        leftHtml.push(info.traits.map(t => `<div>[${t}]</div>`).join(""));
+        leftHtml.push(traits.map(t => `<div>[${t}]</div>`).join(""));
     }
 
     if (p.disabled?.length) {
@@ -52,7 +55,6 @@ export function renderPersona(info) {
         }
     }
 
-    // Правая колонка — навыки
     const skillsHtml = Object.entries(skills)
         .map(([name, lvl]) => {
             const isViolenceSkill = (name === "Shooting" || name === "Melee");
