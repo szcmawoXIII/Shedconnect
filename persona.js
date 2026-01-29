@@ -1,5 +1,6 @@
-// persona.js — вкладка "Персона"
+// persona.js — RimWorld‑корректная версия
 
+// Русские названия навыков
 const skillNamesRu = {
     Shooting: "Дальний бой",
     Melee: "Ближний бой",
@@ -9,22 +10,40 @@ const skillNamesRu = {
     Plants: "Растениеводство",
     Animals: "Животноводство",
     Crafting: "Ремесло",
-    Artistic: "Творчество",
+    Artistic: "Искусство",
     Medicine: "Медицина",
     Social: "Общение",
     Intellectual: "Умственный труд"
 };
 
-// соответствие WorkType → Skills (как в RimWorld)
+// RimWorld порядок навыков
+const orderedSkills = [
+    "Shooting",
+    "Melee",
+    "Construction",
+    "Mining",
+    "Cooking",
+    "Plants",
+    "Animals",
+    "Crafting",
+    "Artistic",
+    "Medicine",
+    "Social",
+    "Intellectual"
+];
+
+// WorkType → Skills (как в RimWorld)
 const workTypeToSkills = {
+    "насилие": ["Shooting", "Melee"],
     "врач": ["Medicine"],
     "уход": ["Medicine"],
     "надзор": ["Social"],
-    "насили": ["Shooting", "Melee"],
-    "квалифицированная": ["Construction", "Mining", "Cooking", "Plants", "Crafting"]
+    "квалифицированная работа": [
+        "Construction", "Mining", "Cooking", "Plants", "Crafting"
+    ]
 };
 
-// определяем, какие навыки должны быть заблокированы
+// Определяем заблокированные навыки
 function getBlockedSkills(disabledList) {
     const lower = disabledList.map(d => d.toLowerCase());
     const blocked = new Set();
@@ -46,50 +65,43 @@ export function renderPersona(info) {
         return;
     }
 
-    // безопасное приведение типов
-    const p = info.persona && typeof info.persona === "object" ? info.persona : {};
-    const skills = info.skills && typeof info.skills === "object" ? info.skills : {};
-    const passions = info.passions && typeof info.passions === "object" ? info.passions : {};
-    const traits = Array.isArray(info.traits)
-        ? info.traits.filter(t => typeof t === "string")
+    const p = info.persona || {};
+    const skills = info.skills || {};
+    const passions = info.passions || {};
+    const traits = Array.isArray(info.traits) ? info.traits : [];
+
+    // Чистим disabled
+    const disabledClean = Array.isArray(p.disabled)
+        ? p.disabled.filter(x => typeof x === "string" && x.trim() !== "")
         : [];
 
-    // чистим disabled
-    const rawDisabled = Array.isArray(p.disabled) ? p.disabled : [];
-    const disabledClean = rawDisabled.reduce((acc, d) => {
-        if (typeof d === "string") {
-            const t = d.trim();
-            if (t !== "") acc.push(t);
-        }
-        return acc;
-    }, []);
-
-    // определяем заблокированные навыки
+    // Определяем заблокированные навыки
     const blockedSkills = getBlockedSkills(disabledClean);
 
+    // Левая колонка
     const leftHtml = [];
 
-    if (typeof p.gender === "string") leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
-    if (typeof p.age === "number") leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
-    if (typeof p.xenotype === "string") leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
+    if (p.gender) leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
+    if (p.age) leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
+    if (p.xenotype) leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
 
     if (traits.length) {
         leftHtml.push(`<h3>Черты:</h3>`);
         leftHtml.push(traits.map(t => `<div>[${t}]</div>`).join(""));
     }
 
-    // 🔥 Показываем ровно то, что пришло из RimWorld
     if (disabledClean.length) {
         leftHtml.push(`<h3>Недоступные работы:</h3>`);
         leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
     }
 
-    // рендер навыков
-    const skillsHtml = Object.entries(skills)
-        .filter(([_, lvl]) => typeof lvl === "number")
-        .map(([name, lvl]) => {
-            const blocked = blockedSkills.has(name);
+    // Правая колонка — навыки
+    const skillsHtml = orderedSkills
+        .map(name => {
+            const lvl = skills[name];
+            if (typeof lvl !== "number") return "";
 
+            const blocked = blockedSkills.has(name);
             const displayValue = blocked ? "—" : lvl;
 
             const passion =
