@@ -82,7 +82,7 @@ export function renderPersona(info) {
     }
 
     if (disabledClean.length) {
-        leftHtml.push(`<h3>Недоступные работы:</h3>`);
+        leftHtml.push(`<h3>Недоступно:</h3>`);
         leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
     }
 
@@ -129,3 +129,4 @@ export function renderPersona(info) {
         </div>
     `;
 }
+
