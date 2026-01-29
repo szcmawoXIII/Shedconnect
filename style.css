@@ -101,13 +101,15 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .portrait-inner {
-    width: 70%;
-    height: 70%;
+    width: 120%;
+    height: 120%;
+    background-size: cover;
+    background-position: center;
     border-radius: 50%;
-    background: linear-gradient(135deg, #c2a36b, #7a5a2b);
 }
 
 #pawn-main-info {
@@ -120,6 +122,20 @@ body {
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 8px;
+}
+
+#pawn-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#pawn-balance {
+    font-size: 16px;
+    color: #1a1a1a;
+    text-align: right;
+    min-width: 150px;
 }
 
 /* Полоски здоровья/настроения */
@@ -210,7 +226,7 @@ body {
 
 .need-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #7edc7e, #5fa85f);
+    background: linear-gradient(90deg, #6fcf6f, #4fa84f);
 }
 
 /* ================================
@@ -261,9 +277,9 @@ body {
 ================================ */
 
 .kat-icon {
-    width: 24px;
-    height: 24px;
-    vertical-align: -6px;
+    width: 18px;
+    height: 18px;
+    vertical-align: -4px;
     margin-right: 2px;
     opacity: 0.95;
 }
