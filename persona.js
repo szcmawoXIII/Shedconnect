@@ -96,9 +96,9 @@ export function renderPersona(info) {
             const passionLevel = blocked ? 0 : passions[name] ?? 0;
 
             const passionHtml =
-                passionLevel === 1 ? `<span class="rw-passion">🔥</span>` :
-                passionLevel === 2 ? `<span class="rw-passion">🔥🔥</span>` :
-                `<span class="rw-passion"></span>`;
+                passionLevel === 1 ? "🔥" :
+                passionLevel === 2 ? "🔥🔥" :
+                "";
 
             return `
                 <div class="rw-skill-row">
