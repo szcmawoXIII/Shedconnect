@@ -74,8 +74,8 @@ body {
 ================================ */
 
 #pawn-panel {
-    background: rgba(15, 15, 15, 0.9);
-    border: 1px solid #555;
+    background: rgba(20, 20, 20, 0.92);
+    border: 1px solid #666;
     padding: 12px;
     box-shadow: 0 0 15px rgba(0,0,0,0.9);
 }
@@ -84,7 +84,7 @@ body {
     display: flex;
     flex-direction: row;
     margin-bottom: 10px;
-    width: 100%; /* фикс ширины */
+    width: 100%;
 }
 
 #pawn-portrait {
@@ -117,12 +117,10 @@ body {
 }
 
 #pawn-name {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
     margin-bottom: 8px;
 }
-
-/* Полоски здоровья/настроения */
 
 .rw-bar {
     position: relative;
@@ -177,12 +175,10 @@ body {
     background: #3a3a3a;
 }
 
-/* Контент вкладок */
-
 #content {
     width: 100%;
     height: 600px;
-    background: rgba(10, 10, 10, 0.9);
+    background: rgba(12, 12, 12, 0.9);
     border: 1px solid #444;
     padding: 8px;
     box-sizing: border-box;
@@ -195,12 +191,6 @@ body {
 
 .tab.active {
     display: block;
-}
-
-#tab-persona h2,
-#tab-needs h2 {
-    margin-top: 0;
-    font-size: 16px;
 }
 
 /* ================================
@@ -222,39 +212,36 @@ body {
     background: linear-gradient(90deg, #4caf50, #2e7d32);
 }
 
-#pawn-name-row {
-    display: flex;
-    justify-content: space-between;
+/* ================================
+   RIMWORLD-СТИЛЬ ДЛЯ НАВЫКОВ
+================================ */
+
+.rw-skill-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 40px;
     align-items: center;
-    width: 100%;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 15px;
 }
 
-#pawn-balance {
+.rw-skill-name {
+    color: #e0e0e0;
+}
+
+.rw-skill-passion {
+    text-align: center;
+    width: 60px;
     font-size: 16px;
-    color: #d9d9d9;
+    letter-spacing: 2px;
+    opacity: 0.9;
+}
+
+.rw-skill-level {
     text-align: right;
-    min-width: 120px;
+    font-weight: bold;
+    color: #f0f0f0;
 }
 
-#pawn-name-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-#pawn-balance {
-    font-size: 16px;
-    color: #ffffff;
-    text-align: right;
-    min-width: 150px;
-}
-
-.kat-icon {
-    width: 24px;      /* 18 × 1.5 */
-    height: 24px;     /* 18 × 1.5 */
-    vertical-align: -6px; /* чуть ниже, чтобы выровнять по тексту */
-    margin-right: 2px;
-    opacity: 0.95;
-}
-
+/* Чуть крупнее текст */
+#pawn-balance
