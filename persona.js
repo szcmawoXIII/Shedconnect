@@ -41,7 +41,6 @@ export function renderPersona(info) {
         return;
     }
 
-    // Жёсткая нормализация
     const p = info.persona && typeof info.persona === "object" ? info.persona : {};
     const skills = info.skills && typeof info.skills === "object" ? info.skills : {};
     const passions = info.passions && typeof info.passions === "object" ? info.passions : {};
@@ -49,21 +48,18 @@ export function renderPersona(info) {
         ? info.traits.filter(t => typeof t === "string")
         : [];
 
-    // disabled — список недоступных работ (WorkType), как в RimWorld
     const rawDisabled = Array.isArray(p.disabled) ? p.disabled : [];
     const disabledClean = rawDisabled
         .filter(d => typeof d === "string")
         .map(d => d.trim())
         .filter(d => d !== "");
 
-    // disabledSkills — точный список заблокированных навыков из мода
     const blockedSkills = new Set(
         Array.isArray(info.disabledSkills)
             ? info.disabledSkills.filter(s => typeof s === "string")
             : []
     );
 
-    // Левая колонка
     const leftHtml = [];
 
     if (typeof p.gender === "string") {
@@ -86,7 +82,9 @@ export function renderPersona(info) {
         leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
     }
 
-    // Правая колонка — навыки в RimWorld‑порядке
+    // -------------------------------
+    // РОВНЫЕ НАВЫКИ В СТИЛЕ RIMWORLD
+    // -------------------------------
     const skillsHtml = orderedSkills
         .map(name => {
             const lvl = skills[name];
@@ -95,23 +93,18 @@ export function renderPersona(info) {
             const blocked = blockedSkills.has(name);
             const displayValue = blocked ? "—" : lvl;
 
-            const passion =
-                blocked
-                    ? ""
-                    : passions[name] === 1 ? "🔥"
-                    : passions[name] === 2 ? "🔥🔥"
-                    : "";
+            const passionLevel = blocked ? 0 : passions[name] ?? 0;
+
+            const passionHtml =
+                passionLevel === 1 ? `<span class="rw-passion">🔥</span>` :
+                passionLevel === 2 ? `<span class="rw-passion">🔥🔥</span>` :
+                `<span class="rw-passion"></span>`;
 
             return `
-                <div style="
-                    display: grid;
-                    grid-template-columns: 1fr auto auto;
-                    gap: 6px;
-                    margin-bottom: 3px;
-                ">
-                    <div>${skillNamesRu[name] || name}</div>
-                    <div style="text-align:right;">${passion}</div>
-                    <div style="text-align:right;">${displayValue}</div>
+                <div class="rw-skill-row">
+                    <div class="rw-skill-name">${skillNamesRu[name] || name}</div>
+                    <div class="rw-skill-passion">${passionHtml}</div>
+                    <div class="rw-skill-level">${displayValue}</div>
                 </div>
             `;
         })
@@ -123,10 +116,9 @@ export function renderPersona(info) {
                 ${leftHtml.join("")}
             </div>
 
-            <div style="flex: 1; font-size: 14px;">
+            <div style="flex: 1; font-size: 15px;">
                 ${skillsHtml}
             </div>
         </div>
     `;
 }
-
