@@ -218,30 +218,40 @@ body {
 
 .rw-skill-row {
     display: grid;
-    grid-template-columns: 1fr 60px 40px;
+    grid-template-columns: 1fr 50px 40px; /* имя | огоньки | уровень */
     align-items: center;
-    padding: 3px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    font-size: 15px;
+    padding: 2px 0;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .rw-skill-name {
-    color: #e0e0e0;
+    text-align: left;
+    padding-right: 10px;
 }
 
 .rw-skill-passion {
     text-align: center;
-    width: 60px;
-    font-size: 16px;
+    font-size: 18px;
+    width: 50px;
     letter-spacing: 2px;
-    opacity: 0.9;
 }
 
 .rw-skill-level {
     text-align: right;
     font-weight: bold;
-    color: #f0f0f0;
+    width: 40px;
 }
 
 /* Чуть крупнее текст */
-#pawn-balance
+#pawn-balance {
+    font-size: 17px;
+}
+
+.kat-icon {
+    width: 24px;
+    height: 24px;
+    vertical-align: -6px;
+    margin-right: 2px;
+    opacity: 0.95;
+}
