@@ -1,4 +1,4 @@
-// persona.js — RimWorld‑корректная версия
+// persona.js — вкладка "Персона" (RimWorld‑логика)
 
 // Русские названия навыков
 const skillNamesRu = {
@@ -32,30 +32,6 @@ const orderedSkills = [
     "Intellectual"
 ];
 
-// WorkType → Skills (как в RimWorld)
-const workTypeToSkills = {
-    "насилие": ["Shooting", "Melee"],
-    "врач": ["Medicine"],
-    "уход": ["Medicine"],
-    "надзор": ["Social"],
-    "квалифицированная работа": [
-        "Construction", "Mining", "Cooking", "Plants", "Crafting"
-    ]
-};
-
-// Определяем заблокированные навыки
-function getBlockedSkills(disabledList) {
-    const lower = disabledList.map(d => d.toLowerCase());
-    const blocked = new Set();
-
-    for (const [key, skills] of Object.entries(workTypeToSkills)) {
-        if (lower.some(d => d.includes(key))) {
-            skills.forEach(s => blocked.add(s));
-        }
-    }
-    return blocked;
-}
-
 export function renderPersona(info) {
     const container = document.querySelector("#tab-persona");
     if (!container) return;
@@ -65,25 +41,40 @@ export function renderPersona(info) {
         return;
     }
 
-    const p = info.persona || {};
-    const skills = info.skills || {};
-    const passions = info.passions || {};
-    const traits = Array.isArray(info.traits) ? info.traits : [];
-
-    // Чистим disabled
-    const disabledClean = Array.isArray(p.disabled)
-        ? p.disabled.filter(x => typeof x === "string" && x.trim() !== "")
+    // Жёсткая нормализация
+    const p = info.persona && typeof info.persona === "object" ? info.persona : {};
+    const skills = info.skills && typeof info.skills === "object" ? info.skills : {};
+    const passions = info.passions && typeof info.passions === "object" ? info.passions : {};
+    const traits = Array.isArray(info.traits)
+        ? info.traits.filter(t => typeof t === "string")
         : [];
 
-    // Определяем заблокированные навыки
-    const blockedSkills = getBlockedSkills(disabledClean);
+    // disabled — список недоступных работ (WorkType), как в RimWorld
+    const rawDisabled = Array.isArray(p.disabled) ? p.disabled : [];
+    const disabledClean = rawDisabled
+        .filter(d => typeof d === "string")
+        .map(d => d.trim())
+        .filter(d => d !== "");
+
+    // disabledSkills — точный список заблокированных навыков из мода
+    const blockedSkills = new Set(
+        Array.isArray(info.disabledSkills)
+            ? info.disabledSkills.filter(s => typeof s === "string")
+            : []
+    );
 
     // Левая колонка
     const leftHtml = [];
 
-    if (p.gender) leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
-    if (p.age) leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
-    if (p.xenotype) leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
+    if (typeof p.gender === "string") {
+        leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
+    }
+    if (typeof p.age === "number") {
+        leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
+    }
+    if (typeof p.xenotype === "string") {
+        leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
+    }
 
     if (traits.length) {
         leftHtml.push(`<h3>Черты:</h3>`);
@@ -95,7 +86,7 @@ export function renderPersona(info) {
         leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
     }
 
-    // Правая колонка — навыки
+    // Правая колонка — навыки в RimWorld‑порядке
     const skillsHtml = orderedSkills
         .map(name => {
             const lvl = skills[name];
