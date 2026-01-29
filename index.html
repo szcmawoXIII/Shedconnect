@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Shedconnect Overlay</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="overlay.css">
 </head>
 <body>
 
 <div id="overlay-root">
 
+    <!-- ЛЕВАЯ ПАНЕЛЬ -->
     <div id="pawn-list-panel">
         <h2>Активные пешки</h2>
         <div id="pawn-list"></div>
         <button id="refresh-list">Обновить список</button>
     </div>
 
+    <!-- ЦЕНТРАЛЬНАЯ ПАНЕЛЬ -->
     <div id="pawn-panel">
 
         <div id="pawn-header">
@@ -57,7 +59,30 @@
 
     </div>
 
+    <!-- ПРАВАЯ ПАНЕЛЬ — МАГАЗИН -->
+    <div id="shop-panel">
+
+        <h2 style="margin-top:0;">Магазин</h2>
+
+        <div id="shop-tabs">
+            <button data-shop-tab="persona">Персона</button>
+            <button data-shop-tab="health">Здоровье</button>
+            <button data-shop-tab="events">Ивенты</button>
+        </div>
+
+        <div id="shop-content">
+            <div class="shop-tab" id="shop-tab-persona"></div>
+            <div class="shop-tab" id="shop-tab-health"></div>
+            <div class="shop-tab" id="shop-tab-events"></div>
+        </div>
+
+    </div>
+
 </div>
+
+<script type="module" src="shop-persona.js"></script>
+<script type="module" src="shop-health.js"></script>
+<script type="module" src="shop-events.js"></script>
 
 <script type="module" src="overlay.js"></script>
 
