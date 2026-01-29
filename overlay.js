@@ -1,10 +1,13 @@
-// overlay.js — стабильная версия под Supabase
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v1");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v2");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
 import { renderNeeds } from "./needs.js";
 import { renderHealth } from "./health.js";
+
+import { renderShopPersona } from "./shop-persona.js";
+import { renderShopHealth } from "./shop-health.js";
+import { renderShopEvents } from "./shop-events.js";
 
 const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
@@ -17,6 +20,8 @@ let currentPawn = null;
 // ВКЛАДКИ
 // -------------------------------
 document.addEventListener("DOMContentLoaded", () => {
+
+    // Вкладки персонажа
     document.querySelectorAll('#tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
@@ -28,6 +33,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.querySelector('#tab-persona')?.classList.add('active');
+
+    // Вкладки магазина
+    document.querySelectorAll('#shop-tabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.shopTab;
+
+            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+            const target = document.querySelector('#shop-tab-' + tab);
+            if (target) target.classList.add('active');
+        });
+    });
+
+    document.querySelector('#shop-tab-persona')?.classList.add('active');
 
     document.querySelector("#refresh-list").onclick = loadPawnList;
 
@@ -104,12 +122,10 @@ async function loadPawnInfo(user) {
 }
 
 function clearTabs() {
-    const p = document.querySelector("#tab-persona");
-    const n = document.querySelector("#tab-needs");
-    const h = document.querySelector("#tab-health");
-    if (p) p.innerHTML = "";
-    if (n) n.innerHTML = "";
-    if (h) h.innerHTML = "";
+    ["#tab-persona", "#tab-needs", "#tab-health"].forEach(id => {
+        const el = document.querySelector(id);
+        if (el) el.innerHTML = "";
+    });
 }
 
 function tryParse(obj, fallback) {
@@ -130,7 +146,6 @@ function normalizeHealthPercent(value) {
 }
 
 function updatePawnInfo(info) {
-    // Жёсткая нормализация структуры
     info.persona = tryParse(info.persona, {}) || {};
     info.needs = tryParse(info.needs, {}) || {};
     info.healthParts = tryParse(info.healthParts, []) || [];
@@ -161,10 +176,13 @@ function updatePawnInfo(info) {
     if (mood <= 1) mood *= 100;
     setBar("#pawn-mood-fill", mood);
 
-    // Критично: просто вызываем рендеры, без found
     renderPersona(info);
     renderNeeds(info);
     renderHealth(info);
+
+    renderShopPersona(info);
+    renderShopHealth(info);
+    renderShopEvents(info);
 }
 
 // -------------------------------
