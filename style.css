@@ -105,8 +105,8 @@ body {
 }
 
 .portrait-inner {
-    width: 120%;
-    height: 120%;
+    width: 130%;
+    height: 130%;
     background-size: cover;
     background-position: center;
     border-radius: 50%;
@@ -136,9 +136,21 @@ body {
     color: #1a1a1a;
     text-align: right;
     min-width: 150px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
 }
 
-/* Полоски здоровья/настроения */
+.kat-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.95;
+}
+
+/* ================================
+   ПОЛОСКИ ЗДОРОВЬЯ / НАСТРОЕНИЯ
+================================ */
 
 .rw-bar {
     position: relative;
@@ -270,16 +282,4 @@ body {
 
 .shop-tab.active {
     display: block;
-}
-
-/* ================================
-   ИКОНКА КОТИКОВ
-================================ */
-
-.kat-icon {
-    width: 18px;
-    height: 18px;
-    vertical-align: -4px;
-    margin-right: 2px;
-    opacity: 0.95;
 }
