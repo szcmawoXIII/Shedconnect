@@ -3,7 +3,6 @@ export function renderShopHealth(info) {
     if (!el) return;
 
     el.innerHTML = `
-        <h3>Здоровье</h3>
         <div>Здесь будут товары, связанные со здоровьем.</div>
     `;
 }
