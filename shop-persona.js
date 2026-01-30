@@ -3,7 +3,6 @@ export function renderShopPersona(info) {
     if (!el) return;
 
     el.innerHTML = `
-        <h3>Персона</h3>
-        <div>Здесь будут товары, связанные с персонажем.</div>
+<div>Здесь будут товары, связанные с персонажем.</div>
     `;
 }
