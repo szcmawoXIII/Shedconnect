@@ -44,13 +44,8 @@ export function renderHealth(info) {
     }
 
     const hierarchy = [
-        "рука",
-        "предплеч",
-        "кисть",
-        "палец",
-        "бедро",
-        "голень",
-        "стопа"
+        "рука", "предплеч", "кисть", "палец",
+        "бедро", "голень", "стопа"
     ];
 
     function partDepth(partName) {
@@ -176,12 +171,12 @@ export function renderHealth(info) {
     }
 
     container.innerHTML = `
-        <div style="display:flex; gap:40px;">
-            <div style="flex:1; font-size:15px;">
+        <div class="center-columns">
+            <div class="col-left" style="font-size:15px;">
                 ${left.join("")}
             </div>
 
-            <div style="flex:1.3; font-size:15px;">
+            <div class="col-right" style="font-size:15px;">
                 ${right}
             </div>
         </div>
