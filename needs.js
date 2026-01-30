@@ -24,7 +24,7 @@ export function renderNeeds(info) {
     const needsLeft = Object.entries(needs)
         .filter(([name]) => needNamesRu[name])
         .map(([name, val]) => {
-            const ru = needNamesRu[name] || name;
+            const ru = needNamesRu[name];
             const percent = Math.round((val <= 1 ? val * 100 : val));
 
             return `
@@ -47,9 +47,7 @@ export function renderNeeds(info) {
     for (const t of thoughts) {
         if (!t || !t.label) continue;
         const key = t.label.trim().toLowerCase();
-        if (!grouped[key]) {
-            grouped[key] = { label: t.label, total: 0, count: 0 };
-        }
+        if (!grouped[key]) grouped[key] = { label: t.label, total: 0, count: 0 };
         grouped[key].total += t.moodOffset ?? 0;
         grouped[key].count++;
     }
@@ -79,12 +77,12 @@ export function renderNeeds(info) {
         .join("");
 
     container.innerHTML = `
-        <div style="display:flex; gap:25px;">
-            <div style="flex:1; font-size:15px;">
+        <div class="center-columns">
+            <div class="col-left" style="font-size:15px;">
                 ${needsLeft}
             </div>
 
-            <div style="flex:1; font-size:15px;">
+            <div class="col-right" style="font-size:15px;">
                 ${thoughtsRight}
             </div>
         </div>
