@@ -122,7 +122,9 @@ body {
     margin-bottom: 8px;
 }
 
-/* Полоски */
+/* ================================
+   ПОЛОСКИ (здоровье/настроение)
+================================ */
 
 .rw-bar {
     position: relative;
@@ -239,7 +241,7 @@ body {
 }
 
 /* ================================
-   ПОЛОСКИ НУЖД — ВОЗВРАЩАЕМ ВИДИМОСТЬ
+   ПОЛОСКИ НУЖД — ВИДИМОСТЬ
 ================================ */
 
 .need-bar {
@@ -261,20 +263,26 @@ body {
    КАТЫ — УМЕНЬШИТЬ И ВЫРОВНЯТЬ СПРАВА
 ================================ */
 
+#pawn-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 #pawn-balance {
     font-size: 16px;
     color: #ffffff;
-    text-align: right;
-    min-width: 150px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
     gap: 4px;
+    min-width: 150px;
+    text-align: right;
 }
 
 .kat-icon {
     width: 16px;
     height: 16px;
-    vertical-align: -3px;
     opacity: 0.95;
+    vertical-align: -3px;
 }
