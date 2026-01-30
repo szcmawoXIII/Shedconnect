@@ -1,6 +1,5 @@
-// persona.js — вкладка "Персона" (RimWorld‑логика)
+// persona.js — вкладка "Персона"
 
-// Русские названия навыков
 const skillNamesRu = {
     Shooting: "Дальний бой",
     Melee: "Ближний бой",
@@ -16,20 +15,10 @@ const skillNamesRu = {
     Intellectual: "Умственный труд"
 };
 
-// RimWorld порядок навыков
 const orderedSkills = [
-    "Shooting",
-    "Melee",
-    "Construction",
-    "Mining",
-    "Cooking",
-    "Plants",
-    "Animals",
-    "Crafting",
-    "Artistic",
-    "Medicine",
-    "Social",
-    "Intellectual"
+    "Shooting", "Melee", "Construction", "Mining",
+    "Cooking", "Plants", "Animals", "Crafting",
+    "Artistic", "Medicine", "Social", "Intellectual"
 ];
 
 export function renderPersona(info) {
@@ -41,40 +30,26 @@ export function renderPersona(info) {
         return;
     }
 
-    // Жёсткая нормализация
-    const p = info.persona && typeof info.persona === "object" ? info.persona : {};
-    const skills = info.skills && typeof info.skills === "object" ? info.skills : {};
-    const passions = info.passions && typeof info.passions === "object" ? info.passions : {};
-    const traits = Array.isArray(info.traits)
-        ? info.traits.filter(t => typeof t === "string")
+    const p = info.persona || {};
+    const skills = info.skills || {};
+    const passions = info.passions || {};
+    const traits = Array.isArray(info.traits) ? info.traits : [];
+
+    const disabledClean = Array.isArray(p.disabled)
+        ? p.disabled.filter(x => typeof x === "string")
         : [];
 
-    // disabled — список недоступных работ (WorkType), как в RimWorld
-    const rawDisabled = Array.isArray(p.disabled) ? p.disabled : [];
-    const disabledClean = rawDisabled
-        .filter(d => typeof d === "string")
-        .map(d => d.trim())
-        .filter(d => d !== "");
-
-    // disabledSkills — точный список заблокированных навыков из мода
     const blockedSkills = new Set(
         Array.isArray(info.disabledSkills)
-            ? info.disabledSkills.filter(s => typeof s === "string")
+            ? info.disabledSkills
             : []
     );
 
-    // Левая колонка
     const leftHtml = [];
 
-    if (typeof p.gender === "string") {
-        leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
-    }
-    if (typeof p.age === "number") {
-        leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
-    }
-    if (typeof p.xenotype === "string") {
-        leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
-    }
+    if (p.gender) leftHtml.push(`<div><b>Пол:</b> ${p.gender}</div>`);
+    if (p.age) leftHtml.push(`<div><b>Возраст:</b> ${p.age}</div>`);
+    if (p.xenotype) leftHtml.push(`<div><b>Ксенотип:</b> ${p.xenotype}</div>`);
 
     if (traits.length) {
         leftHtml.push(`<h3>Черты:</h3>`);
@@ -86,7 +61,6 @@ export function renderPersona(info) {
         leftHtml.push(disabledClean.map(d => `<div>[${d}]</div>`).join(""));
     }
 
-    // Правая колонка — навыки в RimWorld‑порядке
     const skillsHtml = orderedSkills
         .map(name => {
             const lvl = skills[name];
@@ -96,11 +70,9 @@ export function renderPersona(info) {
             const displayValue = blocked ? "—" : lvl;
 
             const passion =
-                blocked
-                    ? ""
-                    : passions[name] === 1 ? "🔥"
-                    : passions[name] === 2 ? "🔥🔥"
-                    : "";
+                blocked ? "" :
+                passions[name] === 1 ? "🔥" :
+                passions[name] === 2 ? "🔥🔥" : "";
 
             return `
                 <div style="
@@ -118,15 +90,14 @@ export function renderPersona(info) {
         .join("");
 
     container.innerHTML = `
-        <div style="display: flex; gap: 25px;">
-            <div style="flex: 1; font-size: 15px;">
+        <div class="center-columns">
+            <div class="col-left" style="font-size:15px;">
                 ${leftHtml.join("")}
             </div>
 
-            <div style="flex: 1; font-size: 14px;">
+            <div class="col-right" style="font-size:14px;">
                 ${skillsHtml}
             </div>
         </div>
     `;
 }
-
