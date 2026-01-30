@@ -3,7 +3,6 @@ export function renderShopEvents(info) {
     if (!el) return;
 
     el.innerHTML = `
-        <h3>Ивенты</h3>
         <div>Здесь будут ивенты, которые можно купить.</div>
     `;
 }
