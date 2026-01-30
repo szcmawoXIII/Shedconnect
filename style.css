@@ -1,28 +1,31 @@
 /* ================================
-   БАЗА
+   БАЗА + ФОН
 ================================ */
 
 body {
     margin: 0;
     padding: 0;
-    background: transparent;
+    background: url("img/main.png") center center / cover no-repeat fixed;
     font-family: Arial, sans-serif;
     color: #e0e0e0;
 }
 
+/* ================================
+   ЦЕНТРИРОВАНИЕ ВСЕГО ИНТЕРФЕЙСА
+================================ */
+
 #overlay-root {
     width: 1300px;
+    margin: 0 auto;
     height: auto;
     position: relative;
     overflow: hidden;
     display: grid;
 
-    /* НОВЫЕ РАЗМЕРЫ ПАНЕЛЕЙ */
-    grid-template-columns: 130px 600px 500px;
+    /* левая 260px, центр гибкий, правая 350px */
+    grid-template-columns: 260px 1fr 350px;
 
-    /* расстояние между панелями уменьшено в 2 раза */
     grid-gap: 10px;
-
     padding: 20px;
 }
 
@@ -83,9 +86,6 @@ body {
     border: 1px solid #555;
     padding: 12px;
     box-shadow: 0 0 15px rgba(0,0,0,0.9);
-
-    /* фиксированная ширина центра */
-    width: 600px;
 }
 
 #pawn-header {
@@ -214,9 +214,6 @@ body {
     border: 1px solid #555;
     padding: 12px;
     box-shadow: 0 0 15px rgba(0,0,0,0.9);
-
-    /* новая ширина */
-    width: 500px;
 }
 
 #shop-tabs button {
@@ -296,4 +293,21 @@ body {
     height: 16px;
     opacity: 0.95;
     vertical-align: -3px;
+}
+
+/* ================================
+   КОЛОНКИ В ЦЕНТРАЛЬНОЙ ПАНЕЛИ
+================================ */
+
+.center-columns {
+    display: flex;
+    gap: 20px;
+}
+
+.center-columns .col-left {
+    flex: 0.7;
+}
+
+.center-columns .col-right {
+    flex: 1.3;
 }
