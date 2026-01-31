@@ -22,7 +22,7 @@ body {
     overflow: hidden;
     display: grid;
 
-    grid-template-columns: 260px 470px 525px;
+    grid-template-columns: 260px 470px 400px;
     grid-gap: 10px;
     padding: 20px;
 }
@@ -345,3 +345,4 @@ body {
 .center-columns .col-right {
     flex: 1.15;
 }
+
