@@ -15,14 +15,14 @@ body {
 ================================ */
 
 #overlay-root {
-    width: 1150px; /* обновлено */
+    width: 1160px; /* обновлено */
     margin: 0 auto;
     height: auto;
     position: relative;
     overflow: hidden;
     display: grid;
 
-    grid-template-columns: 260px 470px 420px; /* обновлено */
+    grid-template-columns: 260px 470px 430px; /* обновлено */
     grid-gap: 10px;
     padding: 20px;
 }
@@ -217,9 +217,9 @@ body {
 #shop-header {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* выравнивание */
+    align-items: center;
     margin-bottom: 6px;
-    padding-top: 4px; /* слегка опускаем */
+    padding-top: 4px;
 }
 
 #shop-header h2 {
@@ -229,12 +229,17 @@ body {
 }
 
 #shop-balance {
-    font-size: 20px; /* как у h2 */
+    font-size: 20px;
     font-weight: bold;
     color: #ffffff;
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+#shop-balance .kat-icon {
+    width: 24px;   /* увеличено */
+    height: 24px;  /* увеличено */
 }
 
 #shop-tabs {
