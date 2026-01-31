@@ -18,29 +18,49 @@ export function renderNeeds(info) {
         return;
     }
 
-    const needs = info.needs || {};
+    const rawNeeds = info.needs || {};
     const thoughts = info.thoughts || [];
 
-    // 🔧 Нормализация ключей нужд
-    const normalizedNeeds = {};
-    for (const [key, val] of Object.entries(needs)) {
-        const clean = key
+    // -------------------------------
+    // НОРМАЛИЗАЦИЯ НУЖД
+    // -------------------------------
+    const needs = {};
+
+    for (let [key, val] of Object.entries(rawNeeds)) {
+
+        // нормализуем ключ
+        let cleanKey = key
             .replace("Need_", "")
-            .replace(/^\w/, c => c.toUpperCase());
-        normalizedNeeds[clean] = val;
+            .replace(/_/g, "")
+            .toLowerCase();
+
+        // приводим к виду Food, Rest, Beauty...
+        cleanKey = cleanKey.charAt(0).toUpperCase() + cleanKey.slice(1);
+
+        // нормализуем значение
+        if (typeof val === "string") val = val.replace("%", "").replace(",", ".");
+        val = parseFloat(val);
+        if (isNaN(val)) continue;
+
+        // если значение 0–1 → переводим в %
+        if (val <= 1) val = val * 100;
+
+        needs[cleanKey] = Math.max(0, Math.min(100, val));
     }
 
-    const needsLeft = Object.entries(normalizedNeeds)
+    // -------------------------------
+    // ЛЕВАЯ КОЛОНКА — БАРЫ НУЖД
+    // -------------------------------
+    const needsLeft = Object.entries(needs)
         .filter(([name]) => needNamesRu[name])
-        .map(([name, val]) => {
+        .map(([name, percent]) => {
             const ru = needNamesRu[name];
-            const percent = Math.round((val <= 1 ? val * 100 : val));
 
             return `
                 <div style="margin-bottom: 10px;">
                     <div style="font-size: 15px; display:flex; justify-content:space-between;">
                         <span>${ru}</span>
-                        <span>${percent}%</span>
+                        <span>${Math.round(percent)}%</span>
                     </div>
 
                     <div class="need-bar">
@@ -51,8 +71,9 @@ export function renderNeeds(info) {
         })
         .join("");
 
-    // ------------------ мысли ------------------
-
+    // -------------------------------
+    // ПРАВАЯ КОЛОНКА — МЫСЛИ
+    // -------------------------------
     const grouped = {};
 
     for (const t of thoughts) {
@@ -87,6 +108,9 @@ export function renderNeeds(info) {
         })
         .join("");
 
+    // -------------------------------
+    // ВЫВОД
+    // -------------------------------
     container.innerHTML = `
         <div class="center-columns">
             <div class="col-left" style="font-size:15px;">
