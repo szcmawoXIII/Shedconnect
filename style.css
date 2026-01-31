@@ -217,9 +217,17 @@ body {
 #shop-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: center; /* ← ключевая строка */
     margin-bottom: 6px;
+    padding-top: 4px; /* ← слегка опускаем вниз */
 }
+
+#shop-header h2 {
+    margin: 0;
+    padding: 0;
+    line-height: 1; /* чтобы текст не прыгал */
+}
+
 
 #shop-balance {
     font-size: 16px;
@@ -345,4 +353,5 @@ body {
 .center-columns .col-right {
     flex: 1.15;
 }
+
 
