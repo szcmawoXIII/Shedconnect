@@ -15,20 +15,20 @@ body {
 ================================ */
 
 #overlay-root {
-    width: 1255px; /* увеличено после расширения правой панели */
+    width: 1150px; /* обновлено */
     margin: 0 auto;
     height: auto;
     position: relative;
     overflow: hidden;
     display: grid;
 
-    grid-template-columns: 260px 470px 400px;
+    grid-template-columns: 260px 470px 420px; /* обновлено */
     grid-gap: 10px;
     padding: 20px;
 }
 
 /* ================================
-   ЛЕВАЯ ПАНЕЛЬ — SHEDSHOP
+   ЛЕВАЯ ПАНЕЛЬ — СПИСОК ПЕШЕК
 ================================ */
 
 #pawn-list-panel {
@@ -204,7 +204,7 @@ body {
 }
 
 /* ================================
-   ПРАВАЯ ПАНЕЛЬ
+   ПРАВАЯ ПАНЕЛЬ — МАГАЗИН
 ================================ */
 
 #shop-panel {
@@ -217,24 +217,24 @@ body {
 #shop-header {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* ← ключевая строка */
+    align-items: center; /* выравнивание */
     margin-bottom: 6px;
-    padding-top: 4px; /* ← слегка опускаем вниз */
+    padding-top: 4px; /* слегка опускаем */
 }
 
 #shop-header h2 {
     margin: 0;
     padding: 0;
-    line-height: 1; /* чтобы текст не прыгал */
+    line-height: 1;
 }
 
-
 #shop-balance {
-    font-size: 16px;
+    font-size: 20px; /* как у h2 */
+    font-weight: bold;
     color: #ffffff;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 #shop-tabs {
@@ -353,5 +353,3 @@ body {
 .center-columns .col-right {
     flex: 1.15;
 }
-
-
