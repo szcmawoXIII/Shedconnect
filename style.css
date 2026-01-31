@@ -15,14 +15,14 @@ body {
 ================================ */
 
 #overlay-root {
-    width: 1160px; /* обновлено */
+    width: 1155px; /* обновлено */
     margin: 0 auto;
     height: auto;
     position: relative;
     overflow: hidden;
     display: grid;
 
-    grid-template-columns: 260px 470px 430px; /* обновлено */
+    grid-template-columns: 260px 470px 425px; /* обновлено */
     grid-gap: 10px;
     padding: 20px;
 }
@@ -238,8 +238,8 @@ body {
 }
 
 #shop-balance .kat-icon {
-    width: 24px;   /* увеличено */
-    height: 24px;  /* увеличено */
+    width: 24px;
+    height: 24px;
 }
 
 #shop-tabs {
