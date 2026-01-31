@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v2");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v3");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -95,7 +95,6 @@ async function selectPawn(user) {
     currentPawn = user;
 
     document.querySelector("#pawn-name").textContent = user;
-    document.querySelector("#pawn-balance").textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -113,7 +112,6 @@ async function loadPawnInfo(user) {
 
     if (error || !data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
-        document.querySelector("#pawn-balance").textContent = "—";
         clearTabs();
         return;
     }
@@ -151,10 +149,10 @@ function updatePawnInfo(info) {
     info.healthParts = tryParse(info.healthParts, []) || [];
     info.skills = tryParse(info.skills, {}) || {};
     info.passions = tryParse(info.passions, {}) || {};
-    info.disabledSkills = tryParse(info.disabledSkills, []) || [];
+    info.disabledSkills = tryParse(info.disabledSkills, []) || {};
     info.capacities = tryParse(info.capacities, {}) || {};
-    info.thoughts = tryParse(info.thoughts, []) || [];
-    info.traits = tryParse(info.traits, []) || [];
+    info.thoughts = tryParse(info.thoughts, []) || {};
+    info.traits = tryParse(info.traits, []) || {};
     info.pain = info.pain ?? "";
     info.healthSummary = info.healthSummary ?? "0";
 
@@ -196,7 +194,7 @@ async function loadBalance(user) {
         .single();
 
     if (error || !data) {
-        document.querySelector("#pawn-balance").textContent = "—";
+        document.querySelector("#shop-balance").textContent = "—";
         return;
     }
 
@@ -207,8 +205,8 @@ function updateBalance(data) {
     if (!data || !currentPawn) return;
     if (data.user.toLowerCase() !== currentPawn.toLowerCase()) return;
 
-    document.querySelector("#pawn-balance").innerHTML =
-        `<img src="img/catcoin.png" class="kat-icon">Каты: ${data.balance}`;
+    document.querySelector("#shop-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon"> ${data.balance}`;
 }
 
 // -------------------------------
