@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v3");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v4");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -21,7 +21,6 @@ let currentPawn = null;
 // -------------------------------
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Вкладки персонажа
     document.querySelectorAll('#tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
@@ -34,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelector('#tab-persona')?.classList.add('active');
 
-    // Вкладки магазина
     document.querySelectorAll('#shop-tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.shopTab;
@@ -67,6 +65,11 @@ async function loadPawnList() {
     }
 
     renderPawnList(data?.map(x => x.user) ?? []);
+
+    // Автовыбор первой пешки
+    if (data && data.length > 0) {
+        selectPawn(data[0].user);
+    }
 }
 
 function renderPawnList(list) {
