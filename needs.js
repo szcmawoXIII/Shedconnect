@@ -21,7 +21,16 @@ export function renderNeeds(info) {
     const needs = info.needs || {};
     const thoughts = info.thoughts || [];
 
-    const needsLeft = Object.entries(needs)
+    // 🔧 Нормализация ключей нужд
+    const normalizedNeeds = {};
+    for (const [key, val] of Object.entries(needs)) {
+        const clean = key
+            .replace("Need_", "")
+            .replace(/^\w/, c => c.toUpperCase());
+        normalizedNeeds[clean] = val;
+    }
+
+    const needsLeft = Object.entries(normalizedNeeds)
         .filter(([name]) => needNamesRu[name])
         .map(([name, val]) => {
             const ru = needNamesRu[name];
@@ -41,6 +50,8 @@ export function renderNeeds(info) {
             `;
         })
         .join("");
+
+    // ------------------ мысли ------------------
 
     const grouped = {};
 
