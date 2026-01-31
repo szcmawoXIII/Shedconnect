@@ -15,14 +15,14 @@ body {
 ================================ */
 
 #overlay-root {
-    width: 1080px; /* 260 + 470 + 350 */
+    width: 1255px; /* увеличено после расширения правой панели */
     margin: 0 auto;
     height: auto;
     position: relative;
     overflow: hidden;
     display: grid;
 
-    grid-template-columns: 260px 470px 350px;
+    grid-template-columns: 260px 470px 525px;
     grid-gap: 10px;
     padding: 20px;
 }
@@ -185,7 +185,6 @@ body {
     background: #3a3a3a;
 }
 
-/* Центральная панель — прежняя высота */
 #content {
     width: 100%;
     height: 600px;
@@ -215,7 +214,21 @@ body {
     box-shadow: 0 0 15px rgba(0,0,0,0.9);
 }
 
-/* Добавили отступ под вкладками */
+#shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+#shop-balance {
+    font-size: 16px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 #shop-tabs {
     margin-bottom: 6px;
 }
@@ -234,10 +247,9 @@ body {
     background: #3a3a3a;
 }
 
-/* Поле магазина — теперь совпадает по высоте с центральным */
 #shop-content {
     width: 100%;
-    height: 682px; /* 600 + padding + border */
+    height: 682px;
     background: rgba(10, 10, 10, 0.85);
     border: 1px solid #444;
     padding: 8px;
@@ -254,85 +266,15 @@ body {
 }
 
 /* ================================
-   ПОЛОСКИ НУЖД
+   SHOP LINES
 ================================ */
 
-.need-bar {
-    width: 100%;
-    height: 12px;
-    background: #222;
-    border: 1px solid #555;
-    margin-top: 2px;
-    margin-bottom: 6px;
-    position: relative;
-}
-
-.need-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4caf50, #2e7d32);
-}
-
-/* ================================
-   КАТЫ
-================================ */
-
-#pawn-name-row {
+.shop-line {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-#pawn-balance {
-    font-size: 16px;
-    color: #ffffff;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 4px;
-    min-width: 150px;
-    text-align: right;
-}
-
-.kat-icon {
-    width: 16px;
-    height: 16px;
-    opacity: 0.95;
-    vertical-align: -3px;
-}
-
-/* ================================
-   КОЛОНКИ ВНУТРИ ЦЕНТРАЛЬНОЙ ПАНЕЛИ
-================================ */
-
-.center-columns {
-    display: flex;
-    gap: 20px;
-}
-
-/* левая колонка — шире на ~30px */
-.center-columns .col-left {
-    flex: 0.85;
-}
-
-/* правая колонка — подстроена */
-.center-columns .col-right {
-    flex: 1.15;
-}
-
-.shop-line {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 10px;
-    align-items: center;
     margin-bottom: 10px;
     font-size: 15px;
-}
-
-.shop-price {
-    color: #ddd;
-    display: flex;
-    align-items: center;
-    gap: 4px;
 }
 
 .shop-btn {
@@ -342,11 +284,18 @@ body {
     color: #e0e0e0;
     cursor: pointer;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .shop-btn:hover {
     background: #3a3a3a;
 }
+
+/* ================================
+   TRAIT TABS
+================================ */
 
 #trait-tabs button {
     padding: 4px 8px;
@@ -369,5 +318,30 @@ body {
     display: block;
 }
 
+/* ================================
+   КАТЫ
+================================ */
 
+.kat-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.95;
+    vertical-align: -3px;
+}
 
+/* ================================
+   КОЛОНКИ ВНУТРИ ЦЕНТРАЛЬНОЙ ПАНЕЛИ
+================================ */
+
+.center-columns {
+    display: flex;
+    gap: 20px;
+}
+
+.center-columns .col-left {
+    flex: 0.85;
+}
+
+.center-columns .col-right {
+    flex: 1.15;
+}
