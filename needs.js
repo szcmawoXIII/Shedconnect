@@ -27,22 +27,20 @@ export function renderNeeds(info) {
     const needs = {};
 
     for (let [key, val] of Object.entries(rawNeeds)) {
-
-        // нормализуем ключ
         let cleanKey = key
             .replace("Need_", "")
+            .replace(/Need$/i, "")
             .replace(/_/g, "")
             .toLowerCase();
 
-        // приводим к виду Food, Rest, Beauty...
         cleanKey = cleanKey.charAt(0).toUpperCase() + cleanKey.slice(1);
 
-        // нормализуем значение
-        if (typeof val === "string") val = val.replace("%", "").replace(",", ".");
+        if (typeof val === "string") {
+            val = val.replace("%", "").replace(",", ".");
+        }
         val = parseFloat(val);
         if (isNaN(val)) continue;
 
-        // если значение 0–1 → переводим в %
         if (val <= 1) val = val * 100;
 
         needs[cleanKey] = Math.max(0, Math.min(100, val));
