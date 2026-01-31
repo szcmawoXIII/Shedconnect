@@ -319,3 +319,55 @@ body {
     flex: 1.15;
 }
 
+.shop-line {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.shop-price {
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.shop-btn {
+    padding: 4px 8px;
+    background: #2b2b2b;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.shop-btn:hover {
+    background: #3a3a3a;
+}
+
+#trait-tabs button {
+    padding: 4px 8px;
+    margin-right: 6px;
+    background: #2b2b2b;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    cursor: pointer;
+}
+
+#trait-tabs button:hover {
+    background: #3a3a3a;
+}
+
+.trait-tab {
+    display: none;
+}
+
+.trait-tab.active {
+    display: block;
+}
+
+
+
