@@ -320,3 +320,14 @@ body {
     border-bottom-color: var(--rimworld-button-active-border-bottom-color);
 }
 
+/* ================================
+   ICONS
+================================ */
+
+  .kat-icon {
+    width: 10px;
+    height: 10px;
+    opacity: 0.95;
+    vertical-align: -1px;
+}
+
