@@ -158,6 +158,15 @@ body {
     font-size: 13px;
 }
 
+/* ВОССТАНОВЛЕНИЕ РАБОТЫ ВКЛАДОК */
+#content .tab {
+    display: none !important;
+}
+
+#content .tab.active {
+    display: block !important;
+}
+
 /* ================================
    ПРАВАЯ ПАНЕЛЬ
 ================================ */
@@ -169,7 +178,7 @@ body {
     box-shadow: 0 0 15px rgba(0,0,0,0.9);
 }
 
-/* Новый блок — заголовок + баланс */
+/* Заголовок + баланс */
 #shop-header {
     display: flex;
     justify-content: space-between;
@@ -190,6 +199,7 @@ body {
     gap: 4px;
 }
 
+/* Вкладки магазина */
 #shop-tabs {
     margin-bottom: 6px;
 }
@@ -197,6 +207,15 @@ body {
 #shop-tabs button {
     margin-right: 6px;
     font-size: 13px;
+}
+
+/* ВОССТАНОВЛЕНИЕ РАБОТЫ ВКЛАДОК МАГАЗИНА */
+#shop-content .shop-tab {
+    display: none !important;
+}
+
+#shop-content .shop-tab.active {
+    display: block !important;
 }
 
 #shop-content {
@@ -207,14 +226,6 @@ body {
     padding: 8px;
     box-sizing: border-box;
     overflow-y: auto;
-}
-
-.shop-tab {
-    display: none;
-}
-
-.shop-tab.active {
-    display: block;
 }
 
 /* ================================
