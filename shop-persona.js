@@ -14,28 +14,28 @@ export function renderShopPersona(info) {
 
             <div class="shop-line">
                 <span>Вылечить мою пешку</span>
-                <button class="shop-btn" data-action="heal_full">
+                <button class="rw-button" data-action="heal_full">
                     ${PRICE_HEAL} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
             <div class="shop-line">
                 <span>Кормить мою пешку</span>
-                <button class="shop-btn" data-action="feed">
+                <button class="rw-button" data-action="feed">
                     ${PRICE_FEED} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
             <div class="shop-line">
                 <span>Омолодить на 5 лет</span>
-                <button class="shop-btn" data-action="age_minus_5">
+                <button class="rw-button" data-action="age_minus_5">
                     ${PRICE_YOUNG} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
             <div class="shop-line">
                 <span>Сменить пол</span>
-                <button class="shop-btn" data-action="gender_swap">
+                <button class="rw-button" data-action="gender_swap">
                     ${PRICE_GENDER} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
@@ -45,10 +45,10 @@ export function renderShopPersona(info) {
             <h3 style="margin:6px 0;">Добавить черту характера</h3>
 
             <div id="trait-tabs" style="margin-bottom:8px;">
-                <button data-trait-tab="good">Хорошие</button>
-                <button data-trait-tab="bad">Плохие</button>
-                <button data-trait-tab="neutral">Нейтральные</button>
-                <button data-trait-tab="situational">Ситуативные</button>
+                <button class="rw-button" data-trait-tab="good">Хорошие</button>
+                <button class="rw-button" data-trait-tab="bad">Плохие</button>
+                <button class="rw-button" data-trait-tab="neutral">Нейтральные</button>
+                <button class="rw-button" data-trait-tab="situational">Ситуативные</button>
             </div>
 
             <div id="trait-content">
@@ -68,8 +68,7 @@ export function renderShopPersona(info) {
             const tab = btn.dataset.traitTab;
 
             document.querySelectorAll('.trait-tab').forEach(t => t.classList.remove('active'));
-            const target = document.querySelector('#trait-tab-' + tab);
-            if (target) target.classList.add('active');
+            document.querySelector('#trait-tab-' + tab)?.classList.add('active');
         });
     });
 }
