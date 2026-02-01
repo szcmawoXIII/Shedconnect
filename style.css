@@ -15,14 +15,14 @@ body {
 ================================ */
 
 #overlay-root {
-    width: 1120px; /* обновлено */
+    width: 1095px; /* 260 + 470 + 365 */
     margin: 0 auto;
     height: auto;
     position: relative;
     overflow: hidden;
     display: grid;
 
-    grid-template-columns: 260px 470px 390px; /* обновлено */
+    grid-template-columns: 260px 470px 365px;
     grid-gap: 10px;
     padding: 20px;
 }
@@ -255,7 +255,7 @@ body {
 }
 
 #shop-content {
-    width: 390px; /* обновлено */
+    width: 365px; /* обновлено */
     height: 696px; /* обновлено */
     background: rgba(10, 10, 10, 0.85);
     border: 1px solid #444;
@@ -292,29 +292,86 @@ body {
 }
 
 /* ================================
-   КАТЫ
+   RimWorld BUTTONS
 ================================ */
+
+:root {
+    --rimworld-button-background-color: #6a512e;
+    --rimworld-button-border-top-color: #7b6133;
+    --rimworld-button-border-left-color: #4f3222;
+    --rimworld-button-border-right-color: #6d5133;
+    --rimworld-button-border-bottom-color: #4f3d22;
+    --rimworld-button-outline-color: #090704;
+
+    --rimworld-button-hover-background-color: #886432;
+    --rimworld-button-hover-top-color: #967136;
+    --rimworld-button-hover-border-left-color: #664b25;
+    --rimworld-button-hover-border-right-color: #967136;
+    --rimworld-button-hover-border-bottom-color: #664b25;
+
+    --rimworld-button-active-background-color: #624927;
+    --rimworld-button-active-border-top-color: #584223;
+    --rimworld-button-active-border-left-color: #6d5636;
+    --rimworld-button-active-border-right-color: #584223;
+    --rimworld-button-active-border-bottom-color: #6d5636;
+}
+
+.rw-button {
+    display: inline-block;
+    padding: 0.4em 0.7em;
+
+    background: var(--rimworld-button-background-color);
+
+    border-width: 3px;
+    border-style: solid;
+    border-top-color: var(--rimworld-button-border-top-color);
+    border-left-color: var(--rimworld-button-border-left-color);
+    border-right-color: var(--rimworld-button-border-right-color);
+    border-bottom-color: var(--rimworld-button-border-bottom-color);
+
+    outline: 1px solid var(--rimworld-button-outline-color);
+
+    color: #e0e0e0;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+
+    user-select: none;
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.rw-button:hover {
+    background: var(--rimworld-button-hover-background-color);
+    border-top-color: var(--rimworld-button-hover-top-color);
+    border-left-color: var(--rimworld-button-hover-border-left-color);
+    border-right-color: var(--rimworld-button-hover-border-right-color);
+    border-bottom-color: var(--rimworld-button-hover-border-bottom-color);
+}
+
+.rw-button:active {
+    background: var(--rimworld-button-active-background-color);
+    border-top-color: var(--rimworld-button-active-border-top-color);
+    border-left-color: var(--rimworld-button-active-border-left-color);
+    border-right-color: var(--rimworld-button-active-border-right-color);
+    border-bottom-color: var(--rimworld-button-active-border-bottom-color);
+}
+
+/* ================================
+   SHOP LINES
+================================ */
+
+.shop-line {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
 
 .kat-icon {
     width: 16px;
     height: 16px;
     opacity: 0.95;
     vertical-align: -3px;
-}
-
-/* ================================
-   КОЛОНКИ ВНУТРИ ЦЕНТРАЛЬНОЙ ПАНЕЛИ
-================================ */
-
-.center-columns {
-    display: flex;
-    gap: 20px;
-}
-
-.center-columns .col-left {
-    flex: 0.85;
-}
-
-.center-columns .col-right {
-    flex: 1.15;
 }
