@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v2 — RIGHT BALANCE");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v2");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -83,10 +83,7 @@ function renderPawnList(list) {
     list.forEach(user => {
         const btn = document.createElement("button");
         btn.textContent = user;
-
-        // ✔ RimWorld стиль кнопок
-        btn.className = "rw-button";
-
+        btn.className = "rw-button"; // только это добавили
         btn.onclick = () => selectPawn(user);
         container.appendChild(btn);
     });
@@ -99,9 +96,7 @@ async function selectPawn(user) {
     currentPawn = user;
 
     document.querySelector("#pawn-name").textContent = user;
-
-    // ✔ баланс теперь справа
-    document.querySelector("#shop-balance").textContent = "—";
+    document.querySelector("#pawn-balance").textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -119,10 +114,7 @@ async function loadPawnInfo(user) {
 
     if (error || !data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
-
-        // ✔ баланс справа
-        document.querySelector("#shop-balance").textContent = "—";
-
+        document.querySelector("#pawn-balance").textContent = "—";
         clearTabs();
         return;
     }
@@ -195,7 +187,7 @@ function updatePawnInfo(info) {
 }
 
 // -------------------------------
-// БАЛАНС (теперь справа)
+// БАЛАНС
 // -------------------------------
 async function loadBalance(user) {
     const { data, error } = await supabase
@@ -205,7 +197,7 @@ async function loadBalance(user) {
         .single();
 
     if (error || !data) {
-        document.querySelector("#shop-balance").textContent = "—";
+        document.querySelector("#pawn-balance").textContent = "—";
         return;
     }
 
@@ -216,8 +208,8 @@ function updateBalance(data) {
     if (!data || !currentPawn) return;
     if (data.user.toLowerCase() !== currentPawn.toLowerCase()) return;
 
-    document.querySelector("#shop-balance").innerHTML =
-        `<img src="img/catcoin.png" class="kat-icon"> ${data.balance}`;
+    document.querySelector("#pawn-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon">Каты: ${data.balance}`;
 }
 
 // -------------------------------
