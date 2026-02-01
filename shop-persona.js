@@ -1,5 +1,3 @@
-// shop-persona.js — вкладка магазина "Персона"
-
 export function renderShopPersona(info) {
     const el = document.querySelector("#shop-tab-persona");
     if (!el) return;
@@ -40,35 +38,6 @@ export function renderShopPersona(info) {
                 </button>
             </div>
 
-            <hr style="margin:12px 0; border-color:#444;">
-
-            <h3 style="margin:6px 0;">Добавить черту характера</h3>
-
-            <div id="trait-tabs" style="margin-bottom:8px;">
-                <button class="rw-button" data-trait-tab="good">Хорошие</button>
-                <button class="rw-button" data-trait-tab="bad">Плохие</button>
-                <button class="rw-button" data-trait-tab="neutral">Нейтральные</button>
-                <button class="rw-button" data-trait-tab="situational">Ситуативные</button>
-            </div>
-
-            <div id="trait-content">
-                <div class="trait-tab" id="trait-tab-good"></div>
-                <div class="trait-tab" id="trait-tab-bad"></div>
-                <div class="trait-tab" id="trait-tab-neutral"></div>
-                <div class="trait-tab" id="trait-tab-situational"></div>
-            </div>
-
         </div>
     `;
-
-    document.querySelector('#trait-tab-good')?.classList.add('active');
-
-    document.querySelectorAll('#trait-tabs button').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.traitTab;
-
-            document.querySelectorAll('.trait-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector('#trait-tab-' + tab)?.classList.add('active');
-        });
-    });
 }
