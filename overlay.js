@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS FIXED BALANCE v2");
+console.log("OVERLAY.JS FIXED v3");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -19,6 +19,8 @@ let currentPawn = null;
 // INIT
 // -------------------------------
 document.addEventListener("DOMContentLoaded", () => {
+
+    // Вкладки персонажа
     document.querySelectorAll('#tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -27,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     document.querySelector('#tab-persona')?.classList.add('active');
 
+    // Вкладки магазина
     document.querySelectorAll('#shop-tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
@@ -36,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('#shop-tab-persona')?.classList.add('active');
 
     document.querySelector("#refresh-list").onclick = loadPawnList;
+
     loadPawnList();
 });
 
@@ -43,19 +47,27 @@ document.addEventListener("DOMContentLoaded", () => {
 // СПИСОК ПЕШЕК
 // -------------------------------
 async function loadPawnList() {
-    const { data } = await supabase.from("pawns").select("user").order("user", { ascending: true });
+    const { data } = await supabase
+        .from("pawns")
+        .select("user")
+        .order("user", { ascending: true });
+
     renderPawnList(data?.map(x => x.user) ?? []);
+
     if (data && data.length > 0) selectPawn(data[0].user);
 }
 
 function renderPawnList(list) {
     const c = document.querySelector("#pawn-list");
     if (!c) return;
+
     c.innerHTML = "";
+
     if (!list || list.length === 0) {
         c.innerHTML = "<i>Нет активных пешек</i>";
         return;
     }
+
     list.forEach(user => {
         const btn = document.createElement("button");
         btn.textContent = user;
@@ -70,8 +82,10 @@ function renderPawnList(list) {
 // -------------------------------
 async function selectPawn(user) {
     currentPawn = user;
+
     document.querySelector("#pawn-name").textContent = user;
     document.querySelector("#shop-balance").textContent = "—";
+
     await loadPawnInfo(user);
     await loadBalance(user);
 }
@@ -80,13 +94,19 @@ async function selectPawn(user) {
 // ЗАГРУЗКА ПЕШКИ
 // -------------------------------
 async function loadPawnInfo(user) {
-    const { data } = await supabase.from("pawns").select("*").eq("user", user).single();
+    const { data } = await supabase
+        .from("pawns")
+        .select("*")
+        .eq("user", user)
+        .single();
+
     if (!data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
         document.querySelector("#shop-balance").textContent = "—";
         clearTabs();
         return;
     }
+
     updatePawnInfo(data);
 }
 
@@ -106,7 +126,6 @@ function tryParse(obj, fallback) {
 }
 
 function normalizeHealthPercent(v) {
-    if (!v) return 0;
     let n = parseFloat(String(v).replace("%", "").replace(",", "."));
     if (isNaN(n)) return 0;
     return n <= 1 ? n * 100 : n;
@@ -155,16 +174,23 @@ function updatePawnInfo(info) {
 // БАЛАНС (только правая панель)
 // -------------------------------
 async function loadBalance(user) {
-    const { data } = await supabase.from("balances").select("balance").eq("user", user).single();
+    const { data } = await supabase
+        .from("balances")
+        .select("balance")
+        .eq("user", user)
+        .single();
+
     if (!data) {
         document.querySelector("#shop-balance").textContent = "—";
         return;
     }
+
     updateBalance(data);
 }
 
 function updateBalance(data) {
     if (!data || !currentPawn) return;
+
     document.querySelector("#shop-balance").innerHTML =
         `<img src="img/catcoin.png" class="kat-icon"> ${data.balance}`;
 }
