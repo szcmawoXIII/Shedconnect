@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v4");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v5");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -88,7 +88,6 @@ function renderPawnList(list) {
     list.forEach(user => {
         const btn = document.createElement("button");
         btn.textContent = user;
-        btn.className = "rw-button rw-button--list";
         btn.onclick = () => selectPawn(user);
         container.appendChild(btn);
     });
@@ -101,7 +100,7 @@ async function selectPawn(user) {
     currentPawn = user;
 
     document.querySelector("#pawn-name").textContent = user;
-    document.querySelector("#pawn-balance").textContent = "—";
+    document.querySelector("#shop-balance").textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -119,7 +118,7 @@ async function loadPawnInfo(user) {
 
     if (error || !data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
-        document.querySelector("#pawn-balance").textContent = "—";
+        document.querySelector("#shop-balance").textContent = "—";
         clearTabs();
         return;
     }
@@ -192,7 +191,7 @@ function updatePawnInfo(info) {
 }
 
 // -------------------------------
-// БАЛАНС
+// БАЛАНС (теперь только в правой панели)
 // -------------------------------
 async function loadBalance(user) {
     const { data, error } = await supabase
@@ -202,7 +201,7 @@ async function loadBalance(user) {
         .single();
 
     if (error || !data) {
-        document.querySelector("#pawn-balance").textContent = "—";
+        document.querySelector("#shop-balance").textContent = "—";
         return;
     }
 
@@ -212,8 +211,8 @@ async function loadBalance(user) {
 function updateBalance(data) {
     if (!data || !currentPawn) return;
 
-    document.querySelector("#pawn-balance").innerHTML =
-        `<img src="img/catcoin.png" class="kat-icon">Каты: ${data.balance}`;
+    document.querySelector("#shop-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon"> ${data.balance}`;
 }
 
 // -------------------------------
