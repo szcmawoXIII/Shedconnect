@@ -88,7 +88,6 @@ function renderPawnList(list) {
     list.forEach(user => {
         const btn = document.createElement("button");
         btn.textContent = user;
-        btn.className = "rw-button rw-button--list";
         btn.onclick = () => selectPawn(user);
         container.appendChild(btn);
     });
