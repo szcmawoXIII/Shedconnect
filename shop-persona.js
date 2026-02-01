@@ -14,28 +14,28 @@ export function renderShopPersona(info) {
 
             <div class="shop-line">
                 <span>Вылечить мою пешку</span>
-                <button class="rw-button" data-action="heal_full">
+                <button class="shop-btn" data-action="heal_full">
                     ${PRICE_HEAL} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
             <div class="shop-line">
                 <span>Кормить мою пешку</span>
-                <button class="rw-button" data-action="feed">
+                <button class="shop-btn" data-action="feed">
                     ${PRICE_FEED} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
             <div class="shop-line">
                 <span>Омолодить на 5 лет</span>
-                <button class="rw-button" data-action="age_minus_5">
+                <button class="shop-btn" data-action="age_minus_5">
                     ${PRICE_YOUNG} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
             <div class="shop-line">
                 <span>Сменить пол</span>
-                <button class="rw-button" data-action="gender_swap">
+                <button class="shop-btn" data-action="gender_swap">
                     ${PRICE_GENDER} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
@@ -45,10 +45,10 @@ export function renderShopPersona(info) {
             <h3 style="margin:6px 0;">Добавить черту характера</h3>
 
             <div id="trait-tabs" style="margin-bottom:8px;">
-                <button class="rw-button rw-button--tab" data-trait-tab="good">Хорошие</button>
-                <button class="rw-button rw-button--tab" data-trait-tab="bad">Плохие</button>
-                <button class="rw-button rw-button--tab" data-trait-tab="neutral">Нейтральные</button>
-                <button class="rw-button rw-button--tab" data-trait-tab="situational">Ситуативные</button>
+                <button data-trait-tab="good">Хорошие</button>
+                <button data-trait-tab="bad">Плохие</button>
+                <button data-trait-tab="neutral">Нейтральные</button>
+                <button data-trait-tab="situational">Ситуативные</button>
             </div>
 
             <div id="trait-content">
