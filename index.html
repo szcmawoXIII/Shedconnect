@@ -13,7 +13,7 @@
     <div id="pawn-list-panel">
         <h2>Активные пешки</h2>
         <div id="pawn-list"></div>
-        <button id="refresh-list" class="rw-button">Обновить список</button>
+        <button id="refresh-list">Обновить список</button>
     </div>
 
     <!-- ЦЕНТРАЛЬНАЯ ПАНЕЛЬ -->
@@ -46,9 +46,9 @@
         </div>
 
         <div id="tabs">
-            <button class="rw-button" data-tab="persona">Персона</button>
-            <button class="rw-button" data-tab="needs">Нужды</button>
-            <button class="rw-button" data-tab="health">Здоровье</button>
+            <button data-tab="persona">Персона</button>
+            <button data-tab="needs">Нужды</button>
+            <button data-tab="health">Здоровье</button>
         </div>
 
         <div id="content">
@@ -62,15 +62,12 @@
     <!-- ПРАВАЯ ПАНЕЛЬ — МАГАЗИН -->
     <div id="shop-panel">
 
-        <div id="shop-header">
-            <h2 style="margin-top:0;">ShedShop</h2>
-            <div id="shop-balance">—</div>
-        </div>
+        <h2 style="margin-top:0;">ShedShop</h2>
 
         <div id="shop-tabs">
-            <button class="rw-button" data-shop-tab="persona">Персона</button>
-            <button class="rw-button" data-shop-tab="health">Здоровье</button>
-            <button class="rw-button" data-shop-tab="events">Ивенты</button>
+            <button data-shop-tab="persona">Персона</button>
+            <button data-shop-tab="health">Здоровье</button>
+            <button data-shop-tab="events">Ивенты</button>
         </div>
 
         <div id="shop-content">
@@ -83,7 +80,6 @@
 
 </div>
 
-<!-- ВАЖНО: overlay.js должен быть ПОСЛЕ shop-файлов -->
 <script type="module" src="shop-persona.js"></script>
 <script type="module" src="shop-health.js"></script>
 <script type="module" src="shop-events.js"></script>
@@ -92,3 +88,5 @@
 
 </body>
 </html>
+
+
