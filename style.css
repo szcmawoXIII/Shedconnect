@@ -237,7 +237,7 @@ body {
 }
 
 #shop-content {
-    width: 697px;
+    width: 350px;
     height: 696px;
     background: rgba(10, 10, 10, 0.85);
     border: 1px solid #444;
@@ -319,3 +319,4 @@ body {
     border-right-color: var(--rimworld-button-active-border-right-color);
     border-bottom-color: var(--rimworld-button-active-border-bottom-color);
 }
+
