@@ -167,6 +167,16 @@ body {
     display: block !important;
 }
 
+#content {
+    width: 100%;
+    height: 600px;
+    background: rgba(10, 10, 10, 0.85); /* вернули фон */
+    border: 1px solid #444;             /* вернули рамку */
+    padding: 8px;                       /* вернули внутренний отступ */
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
 /* ================================
    ПРАВАЯ ПАНЕЛЬ
 ================================ */
@@ -221,13 +231,12 @@ body {
 #shop-content {
     width: 100%;
     height: 682px;
-    background: transparent; /* убрали чёрный фон */
-    border: none;            /* убрали рамку */
-    padding: 0;              /* убрали внутренние отступы */
+    background: rgba(10, 10, 10, 0.85); /* вернули фон */
+    border: 1px solid #444;             /* вернули рамку */
+    padding: 8px;                       /* вернули внутренний отступ */
     box-sizing: border-box;
     overflow-y: auto;
 }
-
 
 /* ================================
    ПОЛОСКИ НУЖД
@@ -354,4 +363,5 @@ body {
     border-right-color: var(--rw-btn-right-active);
     border-bottom-color: var(--rw-btn-bottom-active);
 }
+
 
