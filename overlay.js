@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v2");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v3");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -84,7 +84,7 @@ function renderPawnList(list) {
         const btn = document.createElement("button");
         btn.textContent = user;
 
-        // ✔ Единственное изменение — RimWorld‑кнопка
+        // RimWorld стиль
         btn.className = "rw-button";
 
         btn.onclick = () => selectPawn(user);
@@ -99,7 +99,7 @@ async function selectPawn(user) {
     currentPawn = user;
 
     document.querySelector("#pawn-name").textContent = user;
-    document.querySelector("#pawn-balance").textContent = "—";
+    document.querySelector("#shop-balance").textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -117,7 +117,7 @@ async function loadPawnInfo(user) {
 
     if (error || !data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
-        document.querySelector("#pawn-balance").textContent = "—";
+        document.querySelector("#shop-balance").textContent = "—";
         clearTabs();
         return;
     }
@@ -200,7 +200,7 @@ async function loadBalance(user) {
         .single();
 
     if (error || !data) {
-        document.querySelector("#pawn-balance").textContent = "—";
+        document.querySelector("#shop-balance").textContent = "—";
         return;
     }
 
@@ -211,8 +211,8 @@ function updateBalance(data) {
     if (!data || !currentPawn) return;
     if (data.user.toLowerCase() !== currentPawn.toLowerCase()) return;
 
-    document.querySelector("#pawn-balance").innerHTML =
-        `<img src="img/catcoin.png" class="kat-icon">Каты: ${data.balance}`;
+    document.querySelector("#shop-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon"> ${data.balance}`;
 }
 
 // -------------------------------
