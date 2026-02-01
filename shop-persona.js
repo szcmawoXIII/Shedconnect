@@ -1,4 +1,4 @@
-// shop-persona.js — вкладка магазина "Персона"
+// shop-persona.js — вкладка магазина "Персона" 
 
 export function renderShopPersona(info) {
     const el = document.querySelector("#shop-tab-persona");
