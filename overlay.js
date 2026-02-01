@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS FIXED RIGHT BALANCE v1");
+console.log("OVERLAY.JS FINAL RIGHT BALANCE v1");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
