@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v5");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v7");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -17,7 +17,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentPawn = null;
 
 // -------------------------------
-// ВКЛАДКИ
+// INIT
 // -------------------------------
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -27,8 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const tab = btn.dataset.tab;
 
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const target = document.querySelector('#tab-' + tab);
-            if (target) target.classList.add('active');
+            document.querySelector('#tab-' + tab)?.classList.add('active');
         });
     });
 
@@ -40,8 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const tab = btn.dataset.shopTab;
 
             document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
-            const target = document.querySelector('#shop-tab-' + tab);
-            if (target) target.classList.add('active');
+            document.querySelector('#shop-tab-' + tab)?.classList.add('active');
         });
     });
 
@@ -68,7 +66,6 @@ async function loadPawnList() {
 
     renderPawnList(data?.map(x => x.user) ?? []);
 
-    // Автовыбор первой пешки
     if (data && data.length > 0) {
         selectPawn(data[0].user);
     }
@@ -88,6 +85,7 @@ function renderPawnList(list) {
     list.forEach(user => {
         const btn = document.createElement("button");
         btn.textContent = user;
+        btn.className = "rw-button";
         btn.onclick = () => selectPawn(user);
         container.appendChild(btn);
     });
@@ -191,7 +189,7 @@ function updatePawnInfo(info) {
 }
 
 // -------------------------------
-// БАЛАНС (теперь только в правой панели)
+// БАЛАНС (только правая панель)
 // -------------------------------
 async function loadBalance(user) {
     const { data, error } = await supabase
