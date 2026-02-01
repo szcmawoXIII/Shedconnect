@@ -369,5 +369,63 @@ body {
     display: block;
 }
 
+/* ================================
+   RimWorld BUTTONS
+================================ */
+
+:root {
+    --rw-btn-bg: #6a512e;
+    --rw-btn-top: #7b6133;
+    --rw-btn-left: #4f3222;
+    --rw-btn-right: #6d5133;
+    --rw-btn-bottom: #4f3d22;
+    --rw-btn-outline: #090704;
+
+    --rw-btn-bg-hover: #886432;
+    --rw-btn-top-hover: #967136;
+    --rw-btn-left-hover: #664b25;
+    --rw-btn-right-hover: #967136;
+    --rw-btn-bottom-hover: #664b25;
+
+    --rw-btn-bg-active: #624927;
+    --rw-btn-top-active: #584223;
+    --rw-btn-left-active: #6d5636;
+    --rw-btn-right-active: #584223;
+    --rw-btn-bottom-active: #6d5636;
+}
+
+.rw-button {
+    padding: 4px 10px;
+    background: var(--rw-btn-bg);
+    border-width: 3px;
+    border-style: solid;
+    border-top-color: var(--rw-btn-top);
+    border-left-color: var(--rw-btn-left);
+    border-right-color: var(--rw-btn-right);
+    border-bottom-color: var(--rw-btn-bottom);
+    outline: 1px solid var(--rw-btn-outline);
+    color: #e0e0e0;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+}
+
+.rw-button:hover {
+    background: var(--rw-btn-bg-hover);
+    border-top-color: var(--rw-btn-top-hover);
+    border-left-color: var(--rw-btn-left-hover);
+    border-right-color: var(--rw-btn-right-hover);
+    border-bottom-color: var(--rw-btn-bottom-hover);
+}
+
+.rw-button:active {
+    background: var(--rw-btn-bg-active);
+    border-top-color: var(--rw-btn-top-active);
+    border-left-color: var(--rw-btn-left-active);
+    border-right-color: var(--rw-btn-right-active);
+    border-bottom-color: var(--rw-btn-bottom-active);
+}
+
+
 
 
