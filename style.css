@@ -44,18 +44,39 @@ body {
 }
 
 #pawn-list button {
+    display: block;
     width: 100%;
     margin-bottom: 6px;
+    padding: 6px 8px;
+    background: #2b2b2b;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    cursor: pointer;
     text-align: left;
+    font-size: 14px;
+}
+
+#pawn-list button:hover {
+    background: #3a3a3a;
 }
 
 #refresh-list {
     width: 100%;
+    padding: 6px 8px;
+    background: #3b3b3b;
+    color: #e0e0e0;
+    border: 1px solid #666;
+    cursor: pointer;
     margin-top: 8px;
+    font-size: 14px;
+}
+
+#refresh-list:hover {
+    background: #4a4a4a;
 }
 
 /* ================================
-   ЦЕНТРРАЛЬНАЯ ПАНЕЛЬ
+   ЦЕНТРАЛЬНАЯ ПАНЕЛЬ
 ================================ */
 
 #pawn-panel {
@@ -152,6 +173,16 @@ body {
 
 #tabs button {
     margin-right: 6px;
+    padding: 6px 10px;
+    background: #2b2b2b;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#tabs button:hover {
+    background: #3a3a3a;
 }
 
 #content {
@@ -183,34 +214,22 @@ body {
     box-shadow: 0 0 15px rgba(0,0,0,0.9);
 }
 
-#shop-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-    padding-top: 4px;
-}
-
-#shop-header h2 {
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-}
-
-#shop-balance {
-    font-size: 16px;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
 #shop-tabs {
     margin-bottom: 6px;
 }
 
 #shop-tabs button {
     margin-right: 6px;
+    padding: 6px 10px;
+    background: #2b2b2b;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#shop-tabs button:hover {
+    background: #3a3a3a;
 }
 
 #shop-content {
@@ -301,98 +320,50 @@ body {
 
 .shop-line {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     gap: 10px;
     align-items: center;
     margin-bottom: 10px;
     font-size: 15px;
 }
 
-/* ================================
-   RimWorld Button Theme
-================================ */
-
-:root {
-    --rimworld-button-background-color: #6a512e;
-    --rimworld-button-border-top-color: #7b6133;
-    --rimworld-button-border-left-color: #4f3222;
-    --rimworld-button-border-right-color: #6d5133;
-    --rimworld-button-border-bottom-color: #4f3d22;
-    --rimworld-button-outline-color: #090704;
-
-    --rimworld-button-hover-background-color: #886432;
-    --rimworld-button-hover-top-color: #967136;
-    --rimworld-button-hover-border-left-color: #664b25;
-    --rimworld-button-hover-border-right-color: #967136;
-    --rimworld-button-hover-border-bottom-color: #664b25;
-
-    --rimworld-button-active-background-color: #624927;
-    --rimworld-button-active-border-top-color: #584223;
-    --rimworld-button-active-border-left-color: #6d5636;
-    --rimworld-button-active-border-right-color: #584223;
-    --rimworld-button-active-border-bottom-color: #6d5636;
+.shop-price {
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-/* Базовая RimWorld‑кнопка */
-
-.rw-button {
-    display: inline-block;
-    padding: 0.4em 0.7em;
-
-    background: var(--rimworld-button-background-color);
-
-    border-width: 3px;
-    border-style: solid;
-    border-top-color: var(--rimworld-button-border-top-color);
-    border-left-color: var(--rimworld-button-border-left-color);
-    border-right-color: var(--rimworld-button-border-right-color);
-    border-bottom-color: var(--rimworld-button-border-bottom-color);
-
-    outline: 1px solid var(--rimworld-button-outline-color);
-
+.shop-btn {
+    padding: 4px 8px;
+    background: #2b2b2b;
+    border: 1px solid #555;
     color: #e0e0e0;
-    font-size: 14px;
     cursor: pointer;
-    text-align: center;
-
-    user-select: none;
-    transition: background 0.1s, border-color 0.1s;
+    font-size: 14px;
 }
 
-/* Hover */
-
-.rw-button:hover {
-    background: var(--rimworld-button-hover-background-color);
-
-    border-top-color: var(--rimworld-button-hover-top-color);
-    border-left-color: var(--rimworld-button-hover-border-left-color);
-    border-right-color: var(--rimworld-button-hover-border-right-color);
-    border-bottom-color: var(--rimworld-button-hover-border-bottom-color);
+.shop-btn:hover {
+    background: #3a3a3a;
 }
 
-/* Active */
-
-.rw-button:active {
-    background: var(--rimworld-button-active-background-color);
-
-    border-top-color: var(--rimworld-button-active-border-top-color);
-    border-left-color: var(--rimworld-button-active-border-left-color);
-    border-right-color: var(--rimworld-button-active-border-right-color);
-    border-bottom-color: var(--rimworld-button-active-border-bottom-color);
+#trait-tabs button {
+    padding: 4px 8px;
+    margin-right: 6px;
+    background: #2b2b2b;
+    border: 1px solid #555;
+    color: #e0e0e0;
+    cursor: pointer;
 }
 
-/* Модификаторы под разные зоны */
-
-.rw-button--list {
-    width: 100%;
-    text-align: left;
+#trait-tabs button:hover {
+    background: #3a3a3a;
 }
 
-.rw-button--full {
-    width: 100%;
+.trait-tab {
+    display: none;
 }
 
-.rw-button--tab {
-    font-size: 13px;
-    padding: 0.35em 0.7em;
+.trait-tab.active {
+    display: block;
 }
