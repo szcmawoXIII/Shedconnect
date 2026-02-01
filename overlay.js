@@ -83,7 +83,10 @@ function renderPawnList(list) {
     list.forEach(user => {
         const btn = document.createElement("button");
         btn.textContent = user;
-        btn.className = "rw-button"; // RimWorld-стиль кнопки
+
+        // ✔ RimWorld стиль кнопок
+        btn.className = "rw-button";
+
         btn.onclick = () => selectPawn(user);
         container.appendChild(btn);
     });
@@ -96,7 +99,9 @@ async function selectPawn(user) {
     currentPawn = user;
 
     document.querySelector("#pawn-name").textContent = user;
-    document.querySelector("#shop-balance").textContent = "—"; // баланс теперь справа
+
+    // ✔ баланс теперь справа
+    document.querySelector("#shop-balance").textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -114,7 +119,10 @@ async function loadPawnInfo(user) {
 
     if (error || !data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
+
+        // ✔ баланс справа
         document.querySelector("#shop-balance").textContent = "—";
+
         clearTabs();
         return;
     }
@@ -187,7 +195,7 @@ function updatePawnInfo(info) {
 }
 
 // -------------------------------
-// БАЛАНС
+// БАЛАНС (теперь справа)
 // -------------------------------
 async function loadBalance(user) {
     const { data, error } = await supabase
