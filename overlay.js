@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v3");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v4");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -68,7 +68,7 @@ async function loadPawnList() {
 
     renderPawnList(data?.map(x => x.user) ?? []);
 
-    // 🔥 Автовыбор первой пешки
+    // Автовыбор первой пешки
     if (data && data.length > 0) {
         selectPawn(data[0].user);
     }
@@ -100,6 +100,7 @@ async function selectPawn(user) {
     currentPawn = user;
 
     document.querySelector("#pawn-name").textContent = user;
+    document.querySelector("#pawn-balance").textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -117,6 +118,7 @@ async function loadPawnInfo(user) {
 
     if (error || !data) {
         document.querySelector("#pawn-name").textContent = "Пешка не найдена";
+        document.querySelector("#pawn-balance").textContent = "—";
         clearTabs();
         return;
     }
@@ -203,12 +205,11 @@ async function loadBalance(user) {
         return;
     }
 
-    updateBalance({ user, balance: data.balance });
+    updateBalance(data);
 }
 
 function updateBalance(data) {
     if (!data || !currentPawn) return;
-    if (data.user.toLowerCase() !== currentPawn.toLowerCase()) return;
 
     document.querySelector("#pawn-balance").innerHTML =
         `<img src="img/catcoin.png" class="kat-icon">Каты: ${data.balance}`;
