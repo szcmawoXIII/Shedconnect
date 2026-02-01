@@ -1,4 +1,4 @@
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v2 SAFE BALANCE");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v2");
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
@@ -15,29 +15,6 @@ const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentPawn = null;
-
-// -------------------------------
-// ХЕЛПЕРЫ ДЛЯ БАЛАНСА (НЕ ПАДАЕМ, ЕСЛИ ЭЛЕМЕНТА НЕТ)
-// -------------------------------
-function getBalanceElement() {
-    return (
-        document.querySelector("#pawn-balance") ||
-        document.querySelector("#shop-balance") ||
-        null
-    );
-}
-
-function setBalanceText(text) {
-    const el = getBalanceElement();
-    if (!el) return;
-    el.textContent = text;
-}
-
-function setBalanceHtml(html) {
-    const el = getBalanceElement();
-    if (!el) return;
-    el.innerHTML = html;
-}
 
 // -------------------------------
 // ВКЛАДКИ
@@ -106,7 +83,6 @@ function renderPawnList(list) {
     list.forEach(user => {
         const btn = document.createElement("button");
         btn.textContent = user;
-        btn.className = "rw-button";
         btn.onclick = () => selectPawn(user);
         container.appendChild(btn);
     });
@@ -118,10 +94,8 @@ function renderPawnList(list) {
 async function selectPawn(user) {
     currentPawn = user;
 
-    const nameEl = document.querySelector("#pawn-name");
-    if (nameEl) nameEl.textContent = user;
-
-    setBalanceText("—");
+    document.querySelector("#pawn-name").textContent = user;
+    document.querySelector("#pawn-balance").textContent = "—";
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -138,10 +112,8 @@ async function loadPawnInfo(user) {
         .single();
 
     if (error || !data) {
-        const nameEl = document.querySelector("#pawn-name");
-        if (nameEl) nameEl.textContent = "Пешка не найдена";
-
-        setBalanceText("—");
+        document.querySelector("#pawn-name").textContent = "Пешка не найдена";
+        document.querySelector("#pawn-balance").textContent = "—";
         clearTabs();
         return;
     }
@@ -186,8 +158,7 @@ function updatePawnInfo(info) {
     info.pain = info.pain ?? "";
     info.healthSummary = info.healthSummary ?? "0";
 
-    const nameEl = document.querySelector("#pawn-name");
-    if (nameEl) nameEl.textContent = info.user;
+    document.querySelector("#pawn-name").textContent = info.user;
 
     if (info.portrait && info.portrait.length > 10) {
         const portrait = document.querySelector(".portrait-inner");
@@ -225,7 +196,7 @@ async function loadBalance(user) {
         .single();
 
     if (error || !data) {
-        setBalanceText("—");
+        document.querySelector("#pawn-balance").textContent = "—";
         return;
     }
 
@@ -236,9 +207,8 @@ function updateBalance(data) {
     if (!data || !currentPawn) return;
     if (data.user.toLowerCase() !== currentPawn.toLowerCase()) return;
 
-    setBalanceHtml(
-        `<img src="img/catcoin.png" class="kat-icon"> ${data.balance}`
-    );
+    document.querySelector("#pawn-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon">Каты: ${data.balance}`;
 }
 
 // -------------------------------
