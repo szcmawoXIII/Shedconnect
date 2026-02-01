@@ -13,7 +13,7 @@
     <div id="pawn-list-panel">
         <h2>Активные пешки</h2>
         <div id="pawn-list"></div>
-        <button id="refresh-list" class="rw-button rw-button--full">Обновить список</button>
+        <button id="refresh-list">Обновить список</button>
     </div>
 
     <!-- ЦЕНТРАЛЬНАЯ ПАНЕЛЬ -->
@@ -30,7 +30,6 @@
 
                 <div id="pawn-name-row">
                     <div id="pawn-name">Нет выбранной пешки</div>
-                    <div id="pawn-balance">—</div>
                 </div>
 
                 <div id="pawn-health-bar" class="rw-bar">
@@ -46,9 +45,9 @@
         </div>
 
         <div id="tabs">
-            <button class="rw-button rw-button--tab" data-tab="persona">Персона</button>
-            <button class="rw-button rw-button--tab" data-tab="needs">Нужды</button>
-            <button class="rw-button rw-button--tab" data-tab="health">Здоровье</button>
+            <button data-tab="persona">Персона</button>
+            <button data-tab="needs">Нужды</button>
+            <button data-tab="health">Здоровье</button>
         </div>
 
         <div id="content">
@@ -68,9 +67,9 @@
         </div>
 
         <div id="shop-tabs">
-            <button class="rw-button rw-button--tab" data-shop-tab="persona">Персона</button>
-            <button class="rw-button rw-button--tab" data-shop-tab="health">Здоровье</button>
-            <button class="rw-button rw-button--tab" data-shop-tab="events">Ивенты</button>
+            <button data-shop-tab="persona">Персона</button>
+            <button data-shop-tab="health">Здоровье</button>
+            <button data-shop-tab="events">Ивенты</button>
         </div>
 
         <div id="shop-content">
