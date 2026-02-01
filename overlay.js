@@ -83,6 +83,10 @@ function renderPawnList(list) {
     list.forEach(user => {
         const btn = document.createElement("button");
         btn.textContent = user;
+
+        // ✔ Единственное изменение — RimWorld‑кнопка
+        btn.className = "rw-button";
+
         btn.onclick = () => selectPawn(user);
         container.appendChild(btn);
     });
