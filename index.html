@@ -12,6 +12,13 @@
     <!-- ЛЕВАЯ ПАНЕЛЬ -->
     <div id="pawn-list-panel">
         <h2>Активные пешки</h2>
+
+        <!-- КНОПКА АВТОРИЗАЦИИ TWITCH -->
+        <button id="twitch-login" class="rw-button" style="margin-bottom:10px;">
+            Войти через Twitch
+        </button>
+        <div id="login-status" style="font-size:14px; margin-bottom:10px;"></div>
+
         <div id="pawn-list"></div>
         <button id="refresh-list" class="rw-button">Обновить список</button>
     </div>
@@ -61,11 +68,10 @@
     <!-- ПРАВАЯ ПАНЕЛЬ — МАГАЗИН -->
     <div id="shop-panel">
 
-    <div id="shop-header">
-        <h2>ShedShop</h2>
-        <div id="shop-balance">—</div>
-    </div>
-
+        <div id="shop-header">
+            <h2>ShedShop</h2>
+            <div id="shop-balance">—</div>
+        </div>
 
         <div id="shop-tabs">
             <button class="rw-button" data-shop-tab="persona">Персона</button>
@@ -83,13 +89,16 @@
 
 </div>
 
+<!-- Магазин -->
 <script type="module" src="shop-persona.js"></script>
 <script type="module" src="shop-health.js"></script>
 <script type="module" src="shop-events.js"></script>
 
+<!-- Авторизация Twitch -->
+<script type="module" src="overlay-auth.js"></script>
+
+<!-- Основной оверлей -->
 <script type="module" src="overlay.js"></script>
 
 </body>
 </html>
-
-
