@@ -1,43 +1,47 @@
-export function renderShopPersona(info) {
+// shop-persona.js — динамический магазин "Персона"
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+export async function renderShopPersona(info) {
     const el = document.querySelector("#shop-tab-persona");
     if (!el) return;
 
-    const PRICE_HEAL = 50;
-    const PRICE_FEED = 20;
-    const PRICE_YOUNG = 120;
-    const PRICE_GENDER = 200;
+    // Загружаем товары из таблицы shop_persona
+    const { data, error } = await supabase
+        .from("shop_persona")
+        .select("*")
+        .eq("enabled", true)
+        .order("id", { ascending: true });
 
-    el.innerHTML = `
-        <div style="font-size:15px;">
+    if (error) {
+        console.error("Ошибка загрузки товаров магазина:", error);
+        el.innerHTML = `<div style="color:#f66;">Ошибка загрузки магазина</div>`;
+        return;
+    }
 
-            <div class="shop-line">
-                <span>Вылечить мою пешку</span>
-                <button class="rw-button" data-action="heal_full">
-                    ${PRICE_HEAL} <img src="img/catcoin.png" class="kat-icon">
-                </button>
-            </div>
+    if (!data || data.length === 0) {
+        el.innerHTML = `<div>Товары магазина отключены.</div>`;
+        return;
+    }
 
-            <div class="shop-line">
-                <span>Кормить мою пешку</span>
-                <button class="rw-button" data-action="feed">
-                    ${PRICE_FEED} <img src="img/catcoin.png" class="kat-icon">
-                </button>
-            </div>
+    // Генерируем HTML для каждого товара
+    const html = data
+        .map(item => {
+            return `
+                <div class="shop-line">
+                    <span>${item.label}</span>
+                    <button class="rw-button" data-action="${item.action}">
+                        ${item.price} <img src="img/catcoin.png" class="kat-icon">
+                    </button>
+                </div>
+            `;
+        })
+        .join("");
 
-            <div class="shop-line">
-                <span>Омолодить на 5 лет</span>
-                <button class="rw-button" data-action="age_minus_5">
-                    ${PRICE_YOUNG} <img src="img/catcoin.png" class="kat-icon">
-                </button>
-            </div>
-
-            <div class="shop-line">
-                <span>Сменить пол</span>
-                <button class="rw-button" data-action="gender_swap">
-                    ${PRICE_GENDER} <img src="img/catcoin.png" class="kat-icon">
-                </button>
-            </div>
-
-        </div>
-    `;
+    el.innerHTML = `<div style="font-size:15px;">${html}</div>`;
 }
