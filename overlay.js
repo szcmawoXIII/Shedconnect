@@ -84,12 +84,16 @@ function renderPawnList(list) {
         const btn = document.createElement("button");
         btn.textContent = user;
 
-        // RimWorld стиль
         btn.className = "rw-button";
 
         btn.onclick = () => selectPawn(user);
         container.appendChild(btn);
     });
+
+    // 🔥 АВТО-ВЫБОР ПЕРВОЙ ПЕШКИ
+    if (!currentPawn && list.length > 0) {
+        selectPawn(list[0]);
+    }
 }
 
 // -------------------------------
