@@ -1,33 +1,68 @@
 // ======================================================
-// 1. ПОЛУЧАЕМ UID ИЗ URL И ЗАПИСЫВАЕМ В SUPABASE
+// 1. ПОЛУЧАЕМ UID И ЛОГИН ИЗ URL И ЗАПИСЫВАЕМ В SUPABASE
 // ======================================================
 
 const params = new URLSearchParams(window.location.search);
 const uid = params.get("uid");
+const login = params.get("login");
 
-if (uid) {
-    console.log("Получен Twitch UID:", uid);
+const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 
-    fetch("https://fezlfobvavcxpwzovsoz.supabase.co/rest/v1/users", {
-        method: "POST",
-        headers: {
-            "apikey": "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD",
-            "Authorization": "Bearer sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD",
-            "Content-Type": "application/json",
-            "Prefer": "return=representation"
-        },
-        body: JSON.stringify({
-            user_id: uid,
-            created_at: new Date().toISOString()
-        })
-    })
-    .then(r => r.json())
-    .then(r => console.log("Supabase ответ:", r))
-    .catch(err => console.error("Ошибка Supabase:", err));
+// Универсальная вставка с игнорированием ошибок UNIQUE
+async function safeInsert(table, body) {
+    try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+            method: "POST",
+            headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
+                "Content-Type": "application/json",
+                "Prefer": "return=representation"
+            },
+            body: JSON.stringify(body)
+        });
+
+        const json = await res.json();
+        console.log(`INSERT ${table}:`, json);
+    } catch (err) {
+        console.error(`Ошибка вставки в ${table}:`, err);
+    }
+}
+
+// Если пришли uid + login → создаём записи
+if (uid && login) {
+    console.log("Получены данные Twitch:", { uid, login });
+
+    // 1) Создаём пешку
+    safeInsert("pawns", {
+        user: login,
+        user_id: uid,
+        found: false,
+        healthSummary: "0",
+        traits: [],
+        skills: {},
+        passions: {},
+        needs: {},
+        thoughts: [],
+        pain: "",
+        capacities: {},
+        healthParts: [],
+        persona: {},
+        portrait: "",
+        disabledSkills: []
+    });
+
+    // 2) Создаём баланс
+    safeInsert("balances", {
+        user: login,
+        user_id: uid,
+        balance: 0
+    });
 }
 
 // ======================================================
-// 2. ТВОЙ СТАРЫЙ ОВЕРЛЕЙ (БЕЗ ИМПОРТОВ, БЕЗ МОДУЛЕЙ)
+// 2. ТВОЙ ПОЛНЫЙ ОВЕРЛЕЙ (БЕЗ ИЗМЕНЕНИЙ)
 // ======================================================
 
 console.log("OVERLAY.JS + SUPABASE FINAL HARD v3");
@@ -61,9 +96,6 @@ function setBar(selector, percent) {
 // ======================================================
 // 3. SUPABASE REST API (БЕЗ SDK)
 // ======================================================
-
-const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 
 async function sbSelect(table, params = {}) {
     const url = new URL(`${SUPABASE_URL}/rest/v1/${table}`);
@@ -202,7 +234,6 @@ function updatePawnInfo(info) {
     if (mood <= 1) mood *= 100;
     setBar("#pawn-mood-fill", mood);
 
-    // ====== РЕНДЕРЫ (оставь свои функции) ======
     if (window.renderPersona) renderPersona(info);
     if (window.renderNeeds) renderNeeds(info);
     if (window.renderHealth) renderHealth(info);
@@ -270,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ======================================================
-// 9. ПОЛЛИНГ (вместо realtime, который запрещён CSP)
+// 9. ПОЛЛИНГ (вместо realtime)
 // ======================================================
 
 setInterval(() => {
