@@ -1,8 +1,6 @@
-console.log("OVERLAY.JS + SUPABASE CLEAN v4");
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v3");
 
-// ЧИСТЫЙ КЛИЕНТ SUPABASE БЕЗ AUTH UI
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2/dist/module/SupabaseClient.js";
-
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
 import { renderPersona } from "./persona.js";
 import { renderNeeds } from "./needs.js";
 import { renderHealth } from "./health.js";
@@ -86,6 +84,7 @@ function renderPawnList(list) {
         const btn = document.createElement("button");
         btn.textContent = user;
 
+        // RimWorld стиль
         btn.className = "rw-button";
 
         btn.onclick = () => selectPawn(user);
