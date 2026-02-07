@@ -158,7 +158,6 @@ body {
     font-size: 13px;
 }
 
-/* ВОССТАНОВЛЕНИЕ РАБОТЫ ВКЛАДОК */
 #content .tab {
     display: none !important;
 }
@@ -170,9 +169,9 @@ body {
 #content {
     width: 100%;
     height: 600px;
-    background: rgba(10, 10, 10, 0.85); /* вернули фон */
-    border: 1px solid #444;             /* вернули рамку */
-    padding: 8px;                       /* вернули внутренний отступ */
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid #444;
+    padding: 8px;
     box-sizing: border-box;
     overflow-y: auto;
 }
@@ -188,7 +187,6 @@ body {
     box-shadow: 0 0 15px rgba(0,0,0,0.9);
 }
 
-/* Заголовок + баланс */
 #shop-header {
     display: flex;
     justify-content: space-between;
@@ -209,7 +207,6 @@ body {
     gap: 4px;
 }
 
-/* Вкладки магазина */
 #shop-tabs {
     margin-bottom: 6px;
 }
@@ -219,7 +216,6 @@ body {
     font-size: 13px;
 }
 
-/* ВОССТАНОВЛЕНИЕ РАБОТЫ ВКЛАДОК МАГАЗИНА */
 #shop-content .shop-tab {
     display: none !important;
 }
@@ -231,9 +227,9 @@ body {
 #shop-content {
     width: 100%;
     height: 682px;
-    background: rgba(10, 10, 10, 0.85); /* вернули фон */
-    border: 1px solid #444;             /* вернули рамку */
-    padding: 8px;                       /* вернули внутренний отступ */
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid #444;
+    padding: 8px;
     box-sizing: border-box;
     overflow-y: auto;
 }
@@ -268,10 +264,10 @@ body {
 }
 
 .kat-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     opacity: 0.95;
-    vertical-align: -3px;
+    vertical-align: -2px;
 }
 
 /* ================================
@@ -292,19 +288,12 @@ body {
 }
 
 .shop-line {
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 15px;
-}
-
-.shop-price {
-    color: #ddd;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 4px;
+    margin: 4px 0;
+    padding: 2px 0;
+    font-size: 14px;
 }
 
 /* ================================
@@ -364,4 +353,17 @@ body {
     border-bottom-color: var(--rw-btn-bottom-active);
 }
 
+/* ================================
+   Компактные RW‑кнопки магазина
+================================ */
 
+#shop-tab-persona .rw-button,
+#shop-tab-health .rw-button,
+#shop-tab-events .rw-button {
+    padding: 3px 8px;
+    font-size: 13px;
+    line-height: 14px;
+    height: auto;
+    min-height: 24px;
+    border-width: 2px;
+}
