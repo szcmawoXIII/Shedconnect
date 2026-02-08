@@ -47,7 +47,7 @@ async function loadPawnList() {
 
     data.forEach(pawn => {
         const btn = document.createElement("button");
-        btn.textContent = pawn.name;
+        btn.textContent = pawn.user;
         btn.onclick = () => loadPawn(pawn.id);
         list.appendChild(btn);
     });
@@ -76,6 +76,7 @@ async function loadPawn(id) {
     currentPawnInfo = data;
 
     renderPawn(data);
+    renderNeeds(data);
     renderHealth(data);
     renderShop(data);
 }
@@ -85,22 +86,19 @@ async function loadPawn(id) {
 // ===============================
 
 function renderPawn(info) {
-    document.querySelector("#pawn-name").textContent = info.name;
+    document.querySelector("#pawn-name").textContent = info.user;
 
     const portrait = document.querySelector("#pawn-portrait .portrait-inner");
     portrait.style.background = `url("${info.portrait}") center/cover no-repeat`;
 
-    // Потребности
     const needs = tryParse(info.needs, {});
-    updateBar("food", needs.food);
-    updateBar("rest", needs.rest);
-    updateBar("joy", needs.joy);
-    updateBar("mood", needs.mood, true);
+    updateBar("health", info.healthSummary ?? 1);
+    updateBar("mood", needs.Joy ?? 1, true);
 }
 
 function updateBar(name, value, isMood = false) {
-    const fill = document.querySelector(`#bar-${name} .rw-bar-fill`);
-    const label = document.querySelector(`#bar-${name} .rw-bar-label`);
+    const fill = document.querySelector(`#pawn-${name}-fill`);
+    const label = document.querySelector(`#pawn-${name}-bar .rw-bar-label`);
 
     if (!fill || !label) return;
 
@@ -113,24 +111,43 @@ function updateBar(name, value, isMood = false) {
 }
 
 // ===============================
-// РЕНДЕР ВКЛАДКИ "ЗДОРОВЬЕ"
+// РЕНДЕР НУЖД
+// ===============================
+
+function renderNeeds(info) {
+    const el = document.querySelector("#tab-needs");
+    const needs = tryParse(info.needs, {});
+
+    el.innerHTML = `
+        <div class="needs-list">
+            ${Object.entries(needs)
+                .map(([k, v]) => `
+                    <div class="rw-bar">
+                        <div class="rw-bar-fill" style="width:${v * 100}%"></div>
+                        <span class="rw-bar-label">${k}</span>
+                    </div>
+                `)
+                .join("")}
+        </div>
+    `;
+}
+
+// ===============================
+// РЕНДЕР ЗДОРОВЬЯ
 // ===============================
 
 function renderHealth(info) {
-    const container = document.querySelector("#health-list");
-    container.innerHTML = "";
-
+    const el = document.querySelector("#tab-health");
     const parts = tryParse(info.healthParts, []);
 
-    parts.forEach(p => {
-        const row = document.createElement("div");
-        row.className = "health-row";
-        row.innerHTML = `
-            <div class="health-name">${p.label}</div>
-            <div class="health-severity">${p.severity}</div>
-        `;
-        container.appendChild(row);
-    });
+    el.innerHTML = parts.length === 0
+        ? `<div>Повреждений нет</div>`
+        : parts.map(p => `
+            <div class="health-row">
+                <div class="health-name">${p.label}</div>
+                <div class="health-severity">${p.severity}</div>
+            </div>
+        `).join("");
 }
 
 // ===============================
@@ -161,7 +178,8 @@ document.querySelectorAll("#tabs button").forEach(btn => {
             t.classList.remove("active");
         });
 
-        document.querySelector(`#tab-${tab}`).classList.add("active");
+        const target = document.querySelector(`#tab-${tab}`);
+        if (target) target.classList.add("active");
     };
 });
 
@@ -177,6 +195,7 @@ document.querySelectorAll("#shop-tabs button").forEach(btn => {
             t.classList.remove("active");
         });
 
-        document.querySelector(`#shop-tab-${tab}`).classList.add("active");
+        const target = document.querySelector(`#shop-tab-${tab}`);
+        if (target) target.classList.add("active");
     };
 });
