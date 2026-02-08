@@ -48,11 +48,17 @@ export async function renderShopPersona(info) {
     // ============================
     const { data: traits } = await supabase
         .from("traits")
-        .select("label_ru, enabled")
+        .select("label_ru, description_ru, enabled")
         .order("label_ru", { ascending: true });
 
     const enabledTraits = traits?.filter(t => t.enabled) ?? [];
     const pawnTraits = Array.isArray(info.traits) ? info.traits : [];
+
+    // создаём карту описаний
+    const traitDescriptions = {};
+    enabledTraits.forEach(t => {
+        traitDescriptions[t.label_ru] = t.description_ru || "";
+    });
 
     // ============================
     // 3. Рендер магазина
@@ -91,11 +97,37 @@ export async function renderShopPersona(info) {
 
             <div id="pawn-trait-list-box" class="trait-list-box" style="display:none;"></div>
         </div>
+
+        <div id="trait-tooltip" class="trait-tooltip"></div>
     `;
+
+    const tooltip = document.querySelector("#trait-tooltip");
 
     // ============================
     // 4. Автоподсказки
     // ============================
+
+    function attachTooltipToList(selector) {
+        document.querySelectorAll(`${selector} .trait-item-small`).forEach(el => {
+            const name = el.textContent.trim();
+            const desc = traitDescriptions[name];
+
+            el.addEventListener("mouseenter", e => {
+                if (!desc) return;
+
+                tooltip.textContent = desc;
+                tooltip.style.display = "block";
+
+                const rect = e.target.getBoundingClientRect();
+                tooltip.style.left = rect.right + 12 + "px";
+                tooltip.style.top = rect.top + "px";
+            });
+
+            el.addEventListener("mouseleave", () => {
+                tooltip.style.display = "none";
+            });
+        });
+    }
 
     function filterTraits(inputSelector, listSelector, list) {
         const value = document.querySelector(inputSelector).value.trim().toLowerCase();
@@ -120,6 +152,9 @@ export async function renderShopPersona(info) {
             .join("");
 
         box.style.display = "block";
+
+        // tooltip
+        attachTooltipToList(listSelector);
 
         box.querySelectorAll(".trait-item-small").forEach(el => {
             el.onclick = () => {
@@ -156,6 +191,8 @@ export async function renderShopPersona(info) {
                 .map(t => `<div class="trait-item-small">${t.label_ru}</div>`)
                 .join("");
 
+            attachTooltipToList("#trait-list-box");
+
             box.querySelectorAll(".trait-item-small").forEach(el => {
                 el.onclick = () => {
                     document.querySelector("#trait-add-input").value = el.textContent.trim();
@@ -173,6 +210,8 @@ export async function renderShopPersona(info) {
             box.innerHTML = pawnTraits
                 .map(t => `<div class="trait-item-small">${t}</div>`)
                 .join("");
+
+            attachTooltipToList("#pawn-trait-list-box");
 
             box.querySelectorAll(".trait-item-small").forEach(el => {
                 el.onclick = () => {
