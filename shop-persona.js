@@ -54,7 +54,7 @@ export async function renderShopPersona(info) {
     const enabledTraits = traits?.filter(t => t.enabled) ?? [];
     const pawnTraits = Array.isArray(info.traits) ? info.traits : [];
 
-    // создаём карту описаний
+    // карта описаний
     const traitDescriptions = {};
     enabledTraits.forEach(t => {
         traitDescriptions[t.label_ru] = t.description_ru || "";
@@ -101,12 +101,18 @@ export async function renderShopPersona(info) {
         <div id="trait-tooltip" class="trait-tooltip"></div>
     `;
 
-    const tooltip = document.querySelector("#trait-tooltip");
+    // создаём tooltip, если его нет
+    let tooltip = document.querySelector("#trait-tooltip");
+    if (!tooltip) {
+        tooltip = document.createElement("div");
+        tooltip.id = "trait-tooltip";
+        tooltip.className = "trait-tooltip";
+        document.body.appendChild(tooltip);
+    }
 
     // ============================
-    // 4. Автоподсказки
+    // Функция tooltip
     // ============================
-
     function attachTooltipToList(selector) {
         document.querySelectorAll(`${selector} .trait-item-small`).forEach(el => {
             const name = el.textContent.trim();
@@ -129,6 +135,9 @@ export async function renderShopPersona(info) {
         });
     }
 
+    // ============================
+    // 4. Автоподсказки
+    // ============================
     function filterTraits(inputSelector, listSelector, list) {
         const value = document.querySelector(inputSelector).value.trim().toLowerCase();
         const box = document.querySelector(listSelector);
@@ -153,7 +162,6 @@ export async function renderShopPersona(info) {
 
         box.style.display = "block";
 
-        // tooltip
         attachTooltipToList(listSelector);
 
         box.querySelectorAll(".trait-item-small").forEach(el => {
