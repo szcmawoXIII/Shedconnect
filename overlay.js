@@ -197,18 +197,31 @@ function updatePawnInfo(info) {
 // БАЛАНС
 // -------------------------------
 async function loadBalance(user) {
-    const { data, error } = await supabase
-        .from("balances")
-        .select("balance")
+    // 1. Получаем user_id по имени пешки
+    const { data: pawnRow, error: pawnError } = await supabase
+        .from("pawns")
+        .select("user_id")
         .eq("user", user)
         .single();
 
-    if (error || !data) {
+    if (pawnError || !pawnRow) {
         document.querySelector("#shop-balance").textContent = "—";
         return;
     }
 
-    updateBalance({ user, balance: data.balance });
+    // 2. Получаем баланс по user_id
+    const { data: balRow, error: balError } = await supabase
+        .from("balances")
+        .select("balance")
+        .eq("user_id", pawnRow.user_id)
+        .single();
+
+    if (balError || !balRow) {
+        document.querySelector("#shop-balance").textContent = "—";
+        return;
+    }
+
+    updateBalance({ user, balance: balRow.balance });
 }
 
 function updateBalance(data) {
