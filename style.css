@@ -269,6 +269,7 @@ body {
 .shop-line {
     display: flex;
     align-items: center;
+    justify-content: space-between; /* ЦЕНЫ СПРАВА */
     gap: 6px;
     margin: 4px 0;
     padding: 2px 0;
@@ -281,7 +282,7 @@ body {
 ================================ */
 
 .trait-input {
-    width: 120px;
+    width: 140px;
     font-size: 14px;
     padding: 2px 4px;
 }
@@ -292,9 +293,12 @@ body {
     line-height: 12px;
 }
 
-.trait-price {
-    font-size: 14px;
-    margin-left: 4px;
+.trait-price-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    font-size: 13px;
 }
 
 .trait-list-box {
