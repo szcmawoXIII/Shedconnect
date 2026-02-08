@@ -76,6 +76,18 @@ export async function renderShopPersona(info) {
 
             <hr>
 
+            <!-- НОВЫЙ ТОВАР — ПОДНЯТ ВВЕРХ -->
+            <h3 style="margin-bottom:4px; font-size:14px;">Повысить уровень навыка</h3>
+
+            <div class="shop-line">
+                <input id="skill-up-input" class="rw-input trait-input" placeholder="Навык">
+                <button id="skill-up-btn" class="rw-button trait-price-btn">
+                    500 <img src="img/catcoin.png" class="kat-icon">
+                </button>
+            </div>
+
+            <hr>
+
             <h3 style="margin-bottom:4px; font-size:14px;">Добавить черту</h3>
 
             <div class="shop-line">
@@ -103,17 +115,6 @@ export async function renderShopPersona(info) {
             </div>
 
             <div id="pawn-trait-list-box" class="trait-list-box" style="display:none;"></div>
-
-            <hr>
-
-            <h3 style="margin-bottom:4px; font-size:14px;">Повысить уровень навыка</h3>
-
-            <div class="shop-line">
-                <input id="skill-up-input" class="rw-input trait-input" placeholder="Навык">
-                <button id="skill-up-btn" class="rw-button trait-price-btn">
-                    500 <img src="img/catcoin.png" class="kat-icon">
-                </button>
-            </div>
         </div>
     `;
 
@@ -266,6 +267,4 @@ export async function renderShopPersona(info) {
     document.querySelector("#skill-up-btn").onclick = () => {
         const skill = document.querySelector("#skill-up-input").value.trim();
         if (!skill) return;
-        copyToClipboard(`!skill ${skill}`);
-    };
-}
+        copyToClipboard(`!skill ${skill
