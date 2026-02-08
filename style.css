@@ -424,3 +424,20 @@ body {
     transition: width 0.25s ease-out;
 }
 
+.trait-tooltip {
+    position: absolute;
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid #666;
+    padding: 8px;
+    max-width: 260px;
+    font-size: 13px;
+    line-height: 16px;
+    color: #e0e0e0;
+    z-index: 99999; /* критично */
+    pointer-events: none;
+    display: none;
+    box-shadow: 0 0 8px rgba(0,0,0,0.7);
+}
+
+
+
