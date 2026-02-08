@@ -21,7 +21,6 @@ let currentPawn = null;
 // -------------------------------
 document.addEventListener("DOMContentLoaded", () => {
 
-    // Вкладки персонажа
     document.querySelectorAll('#tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
@@ -34,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelector('#tab-persona')?.classList.add('active');
 
-    // Вкладки магазина
     document.querySelectorAll('#shop-tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.shopTab;
@@ -90,7 +88,6 @@ function renderPawnList(list) {
         container.appendChild(btn);
     });
 
-    // 🔥 АВТО-ВЫБОР ПЕРВОЙ ПЕШКИ
     if (!currentPawn && list.length > 0) {
         selectPawn(list[0]);
     }
@@ -104,6 +101,9 @@ async function selectPawn(user) {
 
     document.querySelector("#pawn-name").textContent = user;
     document.querySelector("#shop-balance").textContent = "—";
+
+    // 🔥 ВАЖНО: сбрасываем флаг, чтобы магазин перерисовался только один раз
+    window.__shopPersonaRendered = false;
 
     await loadPawnInfo(user);
     await loadBalance(user);
@@ -188,35 +188,37 @@ function updatePawnInfo(info) {
     renderNeeds(info);
     renderHealth(info);
 
-    renderShopPersona(info);
-    renderShopHealth(info);
-    renderShopEvents(info);
+    // 🔥 Магазин рендерится только один раз
+    if (!window.__shopPersonaRendered) {
+        renderShopPersona(info);
+        renderShopHealth(info);
+        renderShopEvents(info);
+        window.__shopPersonaRendered = true;
+    }
 }
 
 // -------------------------------
 // БАЛАНС
 // -------------------------------
 async function loadBalance(user) {
-    // 1. Получаем user_id по имени пешки
-    const { data: pawnRow, error: pawnError } = await supabase
+    const { data: pawnRow } = await supabase
         .from("pawns")
         .select("user_id")
         .eq("user", user)
         .single();
 
-    if (pawnError || !pawnRow) {
+    if (!pawnRow) {
         document.querySelector("#shop-balance").textContent = "—";
         return;
     }
 
-    // 2. Получаем баланс по user_id
-    const { data: balRow, error: balError } = await supabase
+    const { data: balRow } = await supabase
         .from("balances")
         .select("balance")
         .eq("user_id", pawnRow.user_id)
         .single();
 
-    if (balError || !balRow) {
+    if (!balRow) {
         document.querySelector("#shop-balance").textContent = "—";
         return;
     }
