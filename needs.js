@@ -1,4 +1,4 @@
-// needs.js — вкладка "Нужды"
+// needs.js — вкладка "Нужды" с RimWorld‑стильными прогресс-барами
 
 const needNamesRu = {
     Food: "Сытость",
@@ -6,7 +6,8 @@ const needNamesRu = {
     Recreation: "Удовлетворённость",
     Beauty: "Окружение",
     Comfort: "Комфорт",
-    Outdoors: "Свежий воздух"
+    Outdoors: "Свежий воздух",
+    Mood: "Настроение"
 };
 
 export function renderNeeds(info) {
@@ -47,7 +48,7 @@ export function renderNeeds(info) {
     }
 
     // -------------------------------
-    // ЛЕВАЯ КОЛОНКА — БАРЫ НУЖД
+    // ЛЕВАЯ КОЛОНКА — RIMWORLD БАРЫ
     // -------------------------------
     const needsLeft = Object.entries(needs)
         .filter(([name]) => needNamesRu[name])
@@ -55,14 +56,14 @@ export function renderNeeds(info) {
             const ru = needNamesRu[name];
 
             return `
-                <div style="margin-bottom: 10px;">
-                    <div style="font-size: 15px; display:flex; justify-content:space-between;">
-                        <span>${ru}</span>
-                        <span>${Math.round(percent)}%</span>
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 15px; margin-bottom: 2px;">
+                        ${ru} — ${Math.round(percent)}%
                     </div>
 
-                    <div class="need-bar">
-                        <div class="need-bar-fill" style="width:${percent}%;"></div>
+                    <div class="rw-bar">
+                        <div class="rw-bar-fill" style="width:${percent}%;"></div>
+                        <span class="rw-bar-label">${Math.round(percent)}%</span>
                     </div>
                 </div>
             `;
