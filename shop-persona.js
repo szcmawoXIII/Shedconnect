@@ -1,11 +1,6 @@
-// shop-persona.js — магазин "Персона"
+// shop-persona.js — магазин "Персона" с tooltip, автопоиском и единым Supabase-клиентом
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js";
-
-const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { supabase } from "./supabase-client.js";
 
 const ACTION_ADD = "trait_add";
 const ACTION_REMOVE = "trait_remove";
@@ -48,11 +43,17 @@ export async function renderShopPersona(info) {
     // ============================
     const { data: traits } = await supabase
         .from("traits")
-        .select("label_ru, enabled")
+        .select("label_ru, description_ru, enabled")
         .order("label_ru", { ascending: true });
 
     const enabledTraits = traits?.filter(t => t.enabled) ?? [];
     const pawnTraits = Array.isArray(info.traits) ? info.traits : [];
+
+    // Создаём карту описаний
+    const traitDescriptions = {};
+    enabledTraits.forEach(t => {
+        traitDescriptions[t.label_ru] = t.description_ru || "";
+    });
 
     // ============================
     // 3. Рендер магазина
@@ -90,6 +91,8 @@ export async function renderShopPersona(info) {
             </div>
 
             <div id="pawn-trait-list-box" class="trait-list-box" style="display:none;"></div>
+
+            <div id="trait-tooltip" class="trait-tooltip"></div>
         </div>
     `;
 
@@ -120,6 +123,8 @@ export async function renderShopPersona(info) {
             .join("");
 
         box.style.display = "block";
+
+        attachTooltipToList(listSelector, traitDescriptions);
 
         box.querySelectorAll(".trait-item-small").forEach(el => {
             el.onclick = () => {
@@ -156,6 +161,8 @@ export async function renderShopPersona(info) {
                 .map(t => `<div class="trait-item-small">${t.label_ru}</div>`)
                 .join("");
 
+            attachTooltipToList("#trait-list-box", traitDescriptions);
+
             box.querySelectorAll(".trait-item-small").forEach(el => {
                 el.onclick = () => {
                     document.querySelector("#trait-add-input").value = el.textContent.trim();
@@ -174,6 +181,8 @@ export async function renderShopPersona(info) {
                 .map(t => `<div class="trait-item-small">${t}</div>`)
                 .join("");
 
+            attachTooltipToList("#pawn-trait-list-box", traitDescriptions);
+
             box.querySelectorAll(".trait-item-small").forEach(el => {
                 el.onclick = () => {
                     document.querySelector("#trait-remove-input").value = el.textContent.trim();
@@ -184,7 +193,34 @@ export async function renderShopPersona(info) {
     };
 
     // ============================
-    // 6. Отправка команд
+    // 6. Tooltip
+    // ============================
+
+    function attachTooltipToList(selector, map) {
+        const tooltip = document.querySelector("#trait-tooltip");
+
+        document.querySelectorAll(`${selector} .trait-item-small`).forEach(el => {
+            el.addEventListener("mouseenter", e => {
+                const name = e.target.textContent.trim();
+                const desc = map[name];
+                if (!desc) return;
+
+                tooltip.textContent = desc;
+                tooltip.style.display = "block";
+
+                const rect = e.target.getBoundingClientRect();
+                tooltip.style.left = rect.right + 10 + "px";
+                tooltip.style.top = rect.top + "px";
+            });
+
+            el.addEventListener("mouseleave", () => {
+                tooltip.style.display = "none";
+            });
+        });
+    }
+
+    // ============================
+    // 7. Отправка команд
     // ============================
 
     document.querySelector("#trait-add-btn").onclick = async () => {
