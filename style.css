@@ -281,14 +281,14 @@ body {
 ================================ */
 
 .trait-input {
-    width: 160px; /* расширено */
+    width: 170px; /* ★ NEW ★ расширено */
     font-size: 14px;
     padding: 2px 4px;
 }
 
 .trait-drop {
-    width: 26px; /* квадратная кнопка */
-    height: 26px;
+    width: 30px;  /* ★ NEW ★ */
+    height: 25px; /* ★ NEW ★ */
     padding: 0;
     font-size: 14px;
     line-height: 14px;
@@ -298,9 +298,11 @@ body {
     align-items: center;
 }
 
+/* ★ NEW ★ — одинаковая длина кнопок магазина */
 .trait-price-btn,
 .shop-line .rw-button {
-    width: 80px; /* одинаковая длина */
+    width: 66px;  /* ★ NEW ★ */
+    height: 25px; /* ★ NEW ★ */
     text-align: center;
     justify-content: center;
     display: flex;
