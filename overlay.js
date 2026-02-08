@@ -1,200 +1,273 @@
-// overlay.js — версия без использования поля id
+console.log("OVERLAY.JS + SUPABASE FINAL HARD v3");
 
-import { supabase } from "./supabase-client.js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js";
+import { renderPersona } from "./persona.js";
+import { renderNeeds } from "./needs.js";
+import { renderHealth } from "./health.js";
 
-console.log("OVERLAY.JS — NO ID MODE");
+import { renderShopPersona } from "./shop-persona.js";
+import { renderShopHealth } from "./shop-health.js";
+import { renderShopEvents } from "./shop-events.js";
 
-// ===============================
-// УТИЛИТЫ
-// ===============================
+const SUPABASE_URL = "https://fezlfobvavcxpwzovsoz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 
-function tryParse(json, fallback) {
-    try {
-        return JSON.parse(json);
-    } catch {
-        return fallback;
-    }
-}
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function clamp(v, min, max) {
-    return Math.max(min, Math.min(max, v));
-}
+let currentPawn = null;
 
-// ===============================
-// ГЛОБАЛЬНОЕ СОСТОЯНИЕ
-// ===============================
+// -------------------------------
+// ВКЛАДКИ
+// -------------------------------
+document.addEventListener("DOMContentLoaded", () => {
 
-let currentPawnId = null;
-let currentPawnInfo = null;
+    document.querySelectorAll('#tabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
 
-// ===============================
-// ЗАГРУЗКА СПИСКА ПЕШЕК
-// ===============================
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const target = document.querySelector('#tab-' + tab);
+            if (target) target.classList.add('active');
+        });
+    });
 
+    document.querySelector('#tab-persona')?.classList.add('active');
+
+    document.querySelectorAll('#shop-tabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.shopTab;
+
+            document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+            const target = document.querySelector('#shop-tab-' + tab);
+            if (target) target.classList.add('active');
+        });
+    });
+
+    document.querySelector('#shop-tab-persona')?.classList.add('active');
+
+    document.querySelector("#refresh-list").onclick = loadPawnList;
+
+    loadPawnList();
+});
+
+// -------------------------------
+// СПИСОК ПЕШЕК
+// -------------------------------
 async function loadPawnList() {
     const { data, error } = await supabase
         .from("pawns")
-        .select("*");
+        .select("user")
+        .order("user", { ascending: true });
 
     if (error) {
         console.error("Ошибка загрузки списка пешек:", error);
         return;
     }
 
-    const list = document.querySelector("#pawn-list");
-    list.innerHTML = "";
-
-    data.forEach(pawn => {
-        const btn = document.createElement("button");
-        btn.textContent = pawn.user;
-        btn.onclick = () => loadPawn(pawn.user_id);
-        list.appendChild(btn);
-    });
+    renderPawnList(data?.map(x => x.user) ?? []);
 }
 
-document.querySelector("#refresh-list").onclick = loadPawnList;
+function renderPawnList(list) {
+    const container = document.querySelector("#pawn-list");
+    if (!container) return;
 
-// ===============================
-// ЗАГРУЗКА ОДНОЙ ПЕШКИ
-// ===============================
+    container.innerHTML = "";
 
-async function loadPawn(id) {
-    currentPawnId = id;
-
-    const { data, error } = await supabase
-        .from("pawns")
-        .select("*")
-        .eq("user_id", id)
-        .single();
-
-    if (error) {
-        console.error("Ошибка загрузки пешки:", error);
+    if (!list || list.length === 0) {
+        container.innerHTML = "<i>Нет активных пешек</i>";
         return;
     }
 
-    currentPawnInfo = data;
+    list.forEach(user => {
+        const btn = document.createElement("button");
+        btn.textContent = user;
 
-    renderPawn(data);
-    renderNeeds(data);
-    renderHealth(data);
-    renderShop(data);
+        btn.className = "rw-button";
+
+        btn.onclick = () => selectPawn(user);
+        container.appendChild(btn);
+    });
+
+    if (!currentPawn && list.length > 0) {
+        selectPawn(list[0]);
+    }
 }
 
-// ===============================
-// РЕНДЕР ОСНОВНОЙ ИНФОРМАЦИИ
-// ===============================
+// -------------------------------
+// ВЫБОР ПЕШКИ
+// -------------------------------
+async function selectPawn(user) {
+    currentPawn = user;
 
-function renderPawn(info) {
+    document.querySelector("#pawn-name").textContent = user;
+    document.querySelector("#shop-balance").textContent = "—";
+
+    // 🔥 ВАЖНО: сбрасываем флаг, чтобы магазин перерисовался только один раз
+    window.__shopPersonaRendered = false;
+
+    await loadPawnInfo(user);
+    await loadBalance(user);
+}
+
+// -------------------------------
+// ЗАГРУЗКА ПЕШКИ
+// -------------------------------
+async function loadPawnInfo(user) {
+    const { data, error } = await supabase
+        .from("pawns")
+        .select("*")
+        .eq("user", user)
+        .single();
+
+    if (error || !data) {
+        document.querySelector("#pawn-name").textContent = "Пешка не найдена";
+        document.querySelector("#shop-balance").textContent = "—";
+        clearTabs();
+        return;
+    }
+
+    updatePawnInfo(data);
+}
+
+function clearTabs() {
+    ["#tab-persona", "#tab-needs", "#tab-health"].forEach(id => {
+        const el = document.querySelector(id);
+        if (el) el.innerHTML = "";
+    });
+}
+
+function tryParse(obj, fallback) {
+    if (obj == null) return fallback;
+    if (typeof obj === "string") {
+        try { return JSON.parse(obj); }
+        catch { return fallback; }
+    }
+    return obj;
+}
+
+function normalizeHealthPercent(value) {
+    if (!value) return 0;
+    let raw = String(value).replace("%", "").replace(",", ".");
+    let num = parseFloat(raw);
+    if (isNaN(num)) return 0;
+    return num <= 1 ? num * 100 : num;
+}
+
+function updatePawnInfo(info) {
+    info.persona = tryParse(info.persona, {}) || {};
+    info.needs = tryParse(info.needs, {}) || {};
+    info.healthParts = tryParse(info.healthParts, []) || [];
+    info.skills = tryParse(info.skills, {}) || {};
+    info.passions = tryParse(info.passions, {}) || {};
+    info.disabledSkills = tryParse(info.disabledSkills, []) || [];
+    info.capacities = tryParse(info.capacities, {}) || {};
+    info.thoughts = tryParse(info.thoughts, []) || [];
+    info.traits = tryParse(info.traits, []) || [];
+    info.pain = info.pain ?? "";
+    info.healthSummary = info.healthSummary ?? "0";
+
     document.querySelector("#pawn-name").textContent = info.user;
 
-    const portrait = document.querySelector("#pawn-portrait .portrait-inner");
-    portrait.style.background = `url("${info.portrait}") center/cover no-repeat`;
+    if (info.portrait && info.portrait.length > 10) {
+        const portrait = document.querySelector(".portrait-inner");
+        if (portrait) {
+            portrait.style.backgroundImage = `url(data:image/png;base64,${info.portrait})`;
+            portrait.style.backgroundSize = "cover";
+            portrait.style.backgroundPosition = "center";
+        }
+    }
 
-    const needs = tryParse(info.needs, {});
-    updateBar("health", info.healthSummary ?? 1);
-    updateBar("mood", needs.Joy ?? 1, true);
+    const health = normalizeHealthPercent(info.healthSummary);
+    setBar("#pawn-health-fill", health);
+
+    let mood = info.needs.Mood ?? info.needs.mood ?? 0;
+    if (mood <= 1) mood *= 100;
+    setBar("#pawn-mood-fill", mood);
+
+    renderPersona(info);
+    renderNeeds(info);
+    renderHealth(info);
+
+    // 🔥 Магазин рендерится только один раз
+    if (!window.__shopPersonaRendered) {
+        renderShopPersona(info);
+        renderShopHealth(info);
+        renderShopEvents(info);
+        window.__shopPersonaRendered = true;
+    }
 }
 
-function updateBar(name, value, isMood = false) {
-    const fill = document.querySelector(`#pawn-${name}-fill`);
-    const label = document.querySelector(`#pawn-${name}-bar .rw-bar-label`);
+// -------------------------------
+// БАЛАНС
+// -------------------------------
+async function loadBalance(user) {
+    const { data: pawnRow } = await supabase
+        .from("pawns")
+        .select("user_id")
+        .eq("user", user)
+        .single();
 
-    if (!fill || !label) return;
+    if (!pawnRow) {
+        document.querySelector("#shop-balance").textContent = "—";
+        return;
+    }
 
-    const pct = clamp(value * 100, 0, 100);
-    fill.style.width = pct + "%";
+    const { data: balRow } = await supabase
+        .from("balances")
+        .select("balance")
+        .eq("user_id", pawnRow.user_id)
+        .single();
 
-    if (isMood) fill.classList.add("mood");
+    if (!balRow) {
+        document.querySelector("#shop-balance").textContent = "—";
+        return;
+    }
 
-    label.textContent = Math.round(pct) + "%";
+    updateBalance({ user, balance: balRow.balance });
 }
 
-// ===============================
-// РЕНДЕР НУЖД
-// ===============================
+function updateBalance(data) {
+    if (!data || !currentPawn) return;
+    if (data.user.toLowerCase() !== currentPawn.toLowerCase()) return;
 
-function renderNeeds(info) {
-    const el = document.querySelector("#tab-needs");
-    const needs = tryParse(info.needs, {});
-
-    el.innerHTML = `
-        <div class="needs-list">
-            ${Object.entries(needs)
-                .map(([k, v]) => `
-                    <div class="rw-bar">
-                        <div class="rw-bar-fill" style="width:${v * 100}%"></div>
-                        <span class="rw-bar-label">${k}</span>
-                    </div>
-                `)
-                .join("")}
-        </div>
-    `;
+    document.querySelector("#shop-balance").innerHTML =
+        `<img src="img/catcoin.png" class="kat-icon"> ${data.balance}`;
 }
 
-// ===============================
-// РЕНДЕР ЗДОРОВЬЯ
-// ===============================
-
-function renderHealth(info) {
-    const el = document.querySelector("#tab-health");
-    const parts = tryParse(info.healthParts, []);
-
-    el.innerHTML = parts.length === 0
-        ? `<div>Повреждений нет</div>`
-        : parts.map(p => `
-            <div class="health-row">
-                <div class="health-name">${p.label}</div>
-                <div class="health-severity">${p.severity}</div>
-            </div>
-        `).join("");
+// -------------------------------
+// ПОЛОСЫ
+// -------------------------------
+function setBar(selector, percent) {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    const clamped = Math.max(0, Math.min(100, percent || 0));
+    el.style.width = clamped + "%";
 }
 
-// ===============================
-// РЕНДЕР МАГАЗИНА
-// ===============================
+// -------------------------------
+// REALTIME
+// -------------------------------
+supabase
+    .channel("pawns-realtime")
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pawns" }, payload => {
+        if (!currentPawn || !payload.new) return;
+        if (payload.new.user?.toLowerCase() === currentPawn.toLowerCase()) {
+            updatePawnInfo(payload.new);
+        }
+        loadPawnList();
+    })
+    .subscribe();
 
-import { renderShopPersona } from "./shop-persona.js";
+supabase
+    .channel("balances-realtime")
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "balances" }, payload => {
+        if (!currentPawn || !payload.new) return;
+        updateBalance(payload.new);
+    })
+    .subscribe();
 
-function renderShop(info) {
-    renderShopPersona(info);
-}
-
-// ===============================
-// ИНИЦИАЛИЗАЦИЯ
-// ===============================
-
-loadPawnList();
-
-// ===============================
-// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
-// ===============================
-
-document.querySelectorAll("#tabs button").forEach(btn => {
-    btn.onclick = () => {
-        const tab = btn.dataset.tab;
-
-        document.querySelectorAll("#content .tab").forEach(t => {
-            t.classList.remove("active");
-        });
-
-        const target = document.querySelector(`#tab-${tab}`);
-        if (target) target.classList.add("active");
-    };
-});
-
-// ===============================
-// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК МАГАЗИНА
-// ===============================
-
-document.querySelectorAll("#shop-tabs button").forEach(btn => {
-    btn.onclick = () => {
-        const tab = btn.dataset.tab;
-
-        document.querySelectorAll("#shop-content .shop-tab").forEach(t => {
-            t.classList.remove("active");
-        });
-
-        const target = document.querySelector(`#shop-tab-${tab}`);
-        if (target) target.classList.add("active");
-    };
-});
+setInterval(() => {
+    if (!currentPawn) return;
+    loadPawnInfo(currentPawn);
+    loadBalance(currentPawn);
+}, 2000);
