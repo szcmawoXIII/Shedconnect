@@ -1,4 +1,4 @@
-// needs.js — вкладка "Нужды" с RimWorld‑стильными прогресс-барами
+// needs.js — RimWorld‑стиль нужд (голубые бары, без чисел внутри)
 
 const needNamesRu = {
     Food: "Сытость",
@@ -56,14 +56,19 @@ export function renderNeeds(info) {
             const ru = needNamesRu[name];
 
             return `
-                <div style="margin-bottom: 12px;">
-                    <div style="font-size: 15px; margin-bottom: 2px;">
-                        ${ru} — ${Math.round(percent)}%
+                <div style="margin-bottom: 14px;">
+                    <div style="
+                        font-size: 15px;
+                        display:flex;
+                        justify-content:space-between;
+                        margin-bottom: 2px;
+                    ">
+                        <span>${ru}</span>
+                        <span>${Math.round(percent)}%</span>
                     </div>
 
-                    <div class="rw-bar">
-                        <div class="rw-bar-fill" style="width:${percent}%;"></div>
-                        <span class="rw-bar-label">${Math.round(percent)}%</span>
+                    <div class="rw-need-bar">
+                        <div class="rw-need-bar-fill" style="width:${percent}%;"></div>
                     </div>
                 </div>
             `;
