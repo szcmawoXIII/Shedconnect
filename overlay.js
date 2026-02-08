@@ -1,8 +1,8 @@
-// overlay.js — финальная стабильная версия, синхронизированная с supabase-client.js
+// overlay.js — версия без использования поля id
 
 import { supabase } from "./supabase-client.js";
 
-console.log("OVERLAY.JS + SUPABASE FINAL HARD v3");
+console.log("OVERLAY.JS — NO ID MODE");
 
 // ===============================
 // УТИЛИТЫ
@@ -34,8 +34,7 @@ let currentPawnInfo = null;
 async function loadPawnList() {
     const { data, error } = await supabase
         .from("pawns")
-        .select("*")
-        .order("id", { ascending: true });
+        .select("*");
 
     if (error) {
         console.error("Ошибка загрузки списка пешек:", error);
@@ -48,7 +47,7 @@ async function loadPawnList() {
     data.forEach(pawn => {
         const btn = document.createElement("button");
         btn.textContent = pawn.user;
-        btn.onclick = () => loadPawn(pawn.id);
+        btn.onclick = () => loadPawn(pawn.user_id);
         list.appendChild(btn);
     });
 }
@@ -65,7 +64,7 @@ async function loadPawn(id) {
     const { data, error } = await supabase
         .from("pawns")
         .select("*")
-        .eq("id", id)
+        .eq("user_id", id)
         .single();
 
     if (error) {
