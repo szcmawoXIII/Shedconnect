@@ -293,14 +293,18 @@ body {
     line-height: 12px;
 }
 
-.trait-price-btn {
+/* ★ NEW ★ — одинаковая длина кнопок магазина */
+.trait-price-btn,
+.shop-line .rw-button {
+    width: 80px; /* рассчитано под 4 цифры + иконку */
+    text-align: center;
+    justify-content: center;
     display: flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 8px;
-    font-size: 13px;
 }
 
+/* список трейтов */
 .trait-list-box {
     border: 1px solid #555;
     padding: 6px;
