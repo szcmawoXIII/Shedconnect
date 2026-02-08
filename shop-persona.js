@@ -19,82 +19,136 @@ export async function renderShopPersona(info) {
         return;
     }
 
-    // Загружаем список трейтов из базы
-    const { data: traits, error } = await supabase
+    // ============================
+    // 1. Загружаем старые товары
+    // ============================
+    const { data: shopItems, error: shopError } = await supabase
+        .from("shop_persona")
+        .select("*")
+        .eq("enabled", true)
+        .order("id", { ascending: true });
+
+    let shopHtml = "";
+
+    if (shopError) {
+        shopHtml = `<div style="color:#f66;">Ошибка загрузки магазина</div>`;
+    } else if (!shopItems || shopItems.length === 0) {
+        shopHtml = `<div>Товары магазина отключены.</div>`;
+    } else {
+        shopHtml = shopItems
+            .map(item => {
+                return `
+                    <div class="shop-line">
+                        <span>${item.label}</span>
+                        <button class="rw-button" data-action="${item.action}">
+                            ${item.price} <img src="img/catcoin.png" class="kat-icon">
+                        </button>
+                    </div>
+                `;
+            })
+            .join("");
+    }
+
+    // ============================
+    // 2. Загружаем список трейтов
+    // ============================
+    const { data: traits, error: traitError } = await supabase
         .from("traits")
         .select("label_ru, enabled")
         .order("label_ru", { ascending: true });
 
-    if (error) {
-        el.innerHTML = `<div style="color:#f66;">Ошибка загрузки трейтов</div>`;
-        return;
-    }
-
-    const enabledTraits = traits.filter(t => t.enabled);
-
-    // Текущие трейт пешки
+    const enabledTraits = traits?.filter(t => t.enabled) ?? [];
     const pawnTraits = Array.isArray(info.traits) ? info.traits : [];
 
-    // HTML списка доступных трейтов
     const traitListHtml = enabledTraits
-        .map(t => `<div class="trait-item">${t.label_ru}</div>`)
+        .map(t => `<div class="trait-item-small">${t.label_ru}</div>`)
         .join("");
 
-    // HTML списка трейтов пешки
     const pawnTraitListHtml = pawnTraits
-        .map(t => `<div class="trait-item">${t}</div>`)
+        .map(t => `<div class="trait-item-small">${t}</div>`)
         .join("");
 
+    // ============================
+    // 3. Рендер магазина
+    // ============================
     el.innerHTML = `
         <div style="font-size:15px;">
+            ${shopHtml}
 
-            <h3>Добавить черту</h3>
+            <hr>
 
-            <div class="shop-line">
+            <h3 style="margin-bottom:6px;">Добавить черту</h3>
+
+            <div class="shop-line" style="font-size:13px;">
                 <input id="trait-add-input" class="rw-input" placeholder="Введите название трейта">
                 <button id="trait-add-btn" class="rw-button">
                     ${TRAIT_PRICE} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
-            <div class="trait-list-box">
+            <button id="toggle-trait-list" class="rw-button" style="margin-top:5px; font-size:12px;">
+                Показать список трейтов
+            </button>
+
+            <div id="trait-list-box" style="display:none; margin-top:5px; font-size:12px;">
                 ${traitListHtml}
             </div>
 
             <hr>
 
-            <h3>Удалить черту</h3>
+            <h3 style="margin-bottom:6px;">Удалить черту</h3>
 
-            <div class="shop-line">
+            <div class="shop-line" style="font-size:13px;">
                 <input id="trait-remove-input" class="rw-input" placeholder="Введите название трейта">
                 <button id="trait-remove-btn" class="rw-button">
                     ${TRAIT_PRICE} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
-            <div class="trait-list-box">
+            <button id="toggle-pawn-trait-list" class="rw-button" style="margin-top:5px; font-size:12px;">
+                Показать черты пешки
+            </button>
+
+            <div id="pawn-trait-list-box" style="display:none; margin-top:5px; font-size:12px;">
                 ${pawnTraitListHtml}
             </div>
-
         </div>
     `;
 
     // ============================
-    // ОБРАБОТЧИКИ КНОПОК
+    // 4. Обработчики кнопок
     // ============================
 
+    // Покупка трейта
     document.querySelector("#trait-add-btn").onclick = async () => {
         const trait = document.querySelector("#trait-add-input").value.trim();
         if (!trait) return;
-
         await buyTrait(info.user_id, info.user, "trait_add", trait);
     };
 
+    // Удаление трейта
     document.querySelector("#trait-remove-btn").onclick = async () => {
         const trait = document.querySelector("#trait-remove-input").value.trim();
         if (!trait) return;
-
         await buyTrait(info.user_id, info.user, "trait_remove", trait);
+    };
+
+    // Сворачивание списка трейтов
+    document.querySelector("#toggle-trait-list").onclick = () => {
+        const box = document.querySelector("#trait-list-box");
+        const btn = document.querySelector("#toggle-trait-list");
+        const visible = box.style.display === "block";
+        box.style.display = visible ? "none" : "block";
+        btn.textContent = visible ? "Показать список трейтов" : "Скрыть список трейтов";
+    };
+
+    // Сворачивание списка трейтов пешки
+    document.querySelector("#toggle-pawn-trait-list").onclick = () => {
+        const box = document.querySelector("#pawn-trait-list-box");
+        const btn = document.querySelector("#toggle-pawn-trait-list");
+        const visible = box.style.display === "block";
+        box.style.display = visible ? "none" : "block";
+        btn.textContent = visible ? "Показать черты пешки" : "Скрыть черты пешки";
     };
 }
 
