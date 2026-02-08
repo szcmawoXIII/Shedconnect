@@ -7,11 +7,9 @@ const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Какие action соответствуют новым товарам
-const NEW_ACTIONS = {
-    add: "trait_add",
-    remove: "trait_remove"
-};
+// Новые товары
+const ACTION_ADD = "trait_add";
+const ACTION_REMOVE = "trait_remove";
 
 export async function renderShopPersona(info) {
     const el = document.querySelector("#shop-tab-persona");
@@ -23,7 +21,7 @@ export async function renderShopPersona(info) {
     }
 
     // ============================
-    // 1. Загружаем старые товары
+    // 1. Загружаем товары магазина
     // ============================
     const { data: shopItems, error: shopError } = await supabase
         .from("shop_persona")
@@ -39,7 +37,7 @@ export async function renderShopPersona(info) {
         shopHtml = `<div>Товары магазина отключены.</div>`;
     } else {
         shopHtml = shopItems
-            .filter(item => !["trait_add", "trait_remove"].includes(item.action))
+            .filter(item => ![ACTION_ADD, ACTION_REMOVE].includes(item.action))
             .map(item => {
                 return `
                     <div class="shop-line">
@@ -73,10 +71,10 @@ export async function renderShopPersona(info) {
         .join("");
 
     // ============================
-    // 3. Загружаем цены новых товаров
+    // 3. Цены новых товаров
     // ============================
-    const priceAdd = shopItems?.find(x => x.action === NEW_ACTIONS.add)?.price ?? 0;
-    const priceRemove = shopItems?.find(x => x.action === NEW_ACTIONS.remove)?.price ?? 0;
+    const priceAdd = shopItems?.find(x => x.action === ACTION_ADD)?.price ?? 0;
+    const priceRemove = shopItems?.find(x => x.action === ACTION_REMOVE)?.price ?? 0;
 
     // ============================
     // 4. Рендер магазина
@@ -89,7 +87,7 @@ export async function renderShopPersona(info) {
 
             <h3 style="margin-bottom:6px;">Добавить черту</h3>
 
-            <div class="shop-line" style="font-size:13px;">
+            <div class="shop-line shop-line-small">
                 <input id="trait-add-input" class="rw-input" placeholder="Введите название трейта">
                 <button id="trait-add-btn" class="rw-button">
                     ${priceAdd} <img src="img/catcoin.png" class="kat-icon">
@@ -108,7 +106,7 @@ export async function renderShopPersona(info) {
 
             <h3 style="margin-bottom:6px;">Удалить черту</h3>
 
-            <div class="shop-line" style="font-size:13px;">
+            <div class="shop-line shop-line-small">
                 <input id="trait-remove-input" class="rw-input" placeholder="Введите название трейта">
                 <button id="trait-remove-btn" class="rw-button">
                     ${priceRemove} <img src="img/catcoin.png" class="kat-icon">
@@ -126,19 +124,19 @@ export async function renderShopPersona(info) {
     `;
 
     // ============================
-    // 5. Обработчики кнопок
+    // 5. Обработчики
     // ============================
 
     document.querySelector("#trait-add-btn").onclick = async () => {
         const trait = document.querySelector("#trait-add-input").value.trim();
         if (!trait) return;
-        await sendCommand(info.user_id, info.user, NEW_ACTIONS.add, trait);
+        await sendCommand(info.user_id, info.user, ACTION_ADD, trait);
     };
 
     document.querySelector("#trait-remove-btn").onclick = async () => {
         const trait = document.querySelector("#trait-remove-input").value.trim();
         if (!trait) return;
-        await sendCommand(info.user_id, info.user, NEW_ACTIONS.remove, trait);
+        await sendCommand(info.user_id, info.user, ACTION_REMOVE, trait);
     };
 
     document.querySelector("#toggle-trait-list").onclick = () => {
