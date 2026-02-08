@@ -7,7 +7,6 @@ const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Новые товары
 const ACTION_ADD = "trait_add";
 const ACTION_REMOVE = "trait_remove";
 
@@ -37,7 +36,7 @@ export async function renderShopPersona(info) {
         .map(item => `
             <div class="shop-line">
                 <span>${item.label}</span>
-                <button class="rw-button" data-action="${item.action}">
+                <button class="rw-button trait-price-btn" data-action="${item.action}">
                     ${item.price} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
@@ -55,14 +54,6 @@ export async function renderShopPersona(info) {
     const enabledTraits = traits?.filter(t => t.enabled) ?? [];
     const pawnTraits = Array.isArray(info.traits) ? info.traits : [];
 
-    const traitListHtml = enabledTraits
-        .map(t => `<div class="trait-item-small">${t.label_ru}</div>`)
-        .join("");
-
-    const pawnTraitListHtml = pawnTraits
-        .map(t => `<div class="trait-item-small">${t}</div>`)
-        .join("");
-
     // ============================
     // 3. Рендер магазина
     // ============================
@@ -74,92 +65,153 @@ export async function renderShopPersona(info) {
 
             <h3 style="margin-bottom:4px; font-size:14px;">Добавить черту</h3>
 
-            <div class="shop-line" style="gap:6px;">
+            <div class="shop-line">
                 <input id="trait-add-input" class="rw-input trait-input" placeholder="Трейт">
                 <button id="trait-add-dropdown" class="rw-button trait-drop">▼</button>
-                <span class="trait-price">${priceAdd}</span>
-                <img src="img/catcoin.png" class="kat-icon">
-                <button id="trait-add-btn" class="rw-button">OK</button>
+
+                <button id="trait-add-btn" class="rw-button trait-price-btn">
+                    ${priceAdd} <img src="img/catcoin.png" class="kat-icon">
+                </button>
             </div>
 
-            <div id="trait-list-box" class="trait-list-box" style="display:none;">
-                ${traitListHtml}
-            </div>
+            <div id="trait-list-box" class="trait-list-box" style="display:none;"></div>
 
             <hr>
 
             <h3 style="margin-bottom:4px; font-size:14px;">Удалить черту</h3>
 
-            <div class="shop-line" style="gap:6px;">
+            <div class="shop-line">
                 <input id="trait-remove-input" class="rw-input trait-input" placeholder="Трейт">
                 <button id="trait-remove-dropdown" class="rw-button trait-drop">▼</button>
-                <span class="trait-price">${priceRemove}</span>
-                <img src="img/catcoin.png" class="kat-icon">
-                <button id="trait-remove-btn" class="rw-button">OK</button>
+
+                <button id="trait-remove-btn" class="rw-button trait-price-btn">
+                    ${priceRemove} <img src="img/catcoin.png" class="kat-icon">
+                </button>
             </div>
 
-            <div id="pawn-trait-list-box" class="trait-list-box" style="display:none;">
-                ${pawnTraitListHtml}
-            </div>
+            <div id="pawn-trait-list-box" class="trait-list-box" style="display:none;"></div>
         </div>
     `;
 
     // ============================
-    // 4. Обработчики
+    // 4. Автоподсказки
     // ============================
 
-    // Показ списка трейтов
+    function filterTraits(inputSelector, listSelector, list) {
+        const value = document.querySelector(inputSelector).value.trim().toLowerCase();
+        const box = document.querySelector(listSelector);
+
+        if (!value) {
+            box.style.display = "none";
+            return;
+        }
+
+        const filtered = list.filter(t =>
+            t.toLowerCase().includes(value)
+        );
+
+        if (filtered.length === 0) {
+            box.style.display = "none";
+            return;
+        }
+
+        box.innerHTML = filtered
+            .map(t => `<div class="trait-item-small">${t}</div>`)
+            .join("");
+
+        box.style.display = "block";
+
+        box.querySelectorAll(".trait-item-small").forEach(el => {
+            el.onclick = () => {
+                document.querySelector(inputSelector).value = el.textContent.trim();
+                box.style.display = "none";
+            };
+        });
+    }
+
+    document.querySelector("#trait-add-input").oninput = () =>
+        filterTraits(
+            "#trait-add-input",
+            "#trait-list-box",
+            enabledTraits.map(t => t.label_ru)
+        );
+
+    document.querySelector("#trait-remove-input").oninput = () =>
+        filterTraits(
+            "#trait-remove-input",
+            "#pawn-trait-list-box",
+            pawnTraits
+        );
+
+    // ============================
+    // 5. Кнопки ▼
+    // ============================
+
     document.querySelector("#trait-add-dropdown").onclick = () => {
-        toggleBox("#trait-list-box");
+        const box = document.querySelector("#trait-list-box");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+
+        if (box.style.display === "block") {
+            box.innerHTML = enabledTraits
+                .map(t => `<div class="trait-item-small">${t.label_ru}</div>`)
+                .join("");
+
+            box.querySelectorAll(".trait-item-small").forEach(el => {
+                el.onclick = () => {
+                    document.querySelector("#trait-add-input").value = el.textContent.trim();
+                    box.style.display = "none";
+                };
+            });
+        }
     };
 
     document.querySelector("#trait-remove-dropdown").onclick = () => {
-        toggleBox("#pawn-trait-list-box");
+        const box = document.querySelector("#pawn-trait-list-box");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+
+        if (box.style.display === "block") {
+            box.innerHTML = pawnTraits
+                .map(t => `<div class="trait-item-small">${t}</div>`)
+                .join("");
+
+            box.querySelectorAll(".trait-item-small").forEach(el => {
+                el.onclick = () => {
+                    document.querySelector("#trait-remove-input").value = el.textContent.trim();
+                    box.style.display = "none";
+                };
+            });
+        }
     };
 
-    // Клик по трейту → автозаполнение
-    document.querySelectorAll("#trait-list-box .trait-item-small").forEach(elm => {
-        elm.onclick = () => {
-            document.querySelector("#trait-add-input").value = elm.textContent.trim();
-        };
-    });
+    // ============================
+    // 6. Отправка команд
+    // ============================
 
-    document.querySelectorAll("#pawn-trait-list-box .trait-item-small").forEach(elm => {
-        elm.onclick = () => {
-            document.querySelector("#trait-remove-input").value = elm.textContent.trim();
-        };
-    });
-
-    // Отправка команд
     document.querySelector("#trait-add-btn").onclick = async () => {
         const trait = document.querySelector("#trait-add-input").value.trim();
         if (!trait) return;
-        await sendCommand(info.user_id, info.user, ACTION_ADD, trait);
+
+        await supabase.from("commands").insert({
+            user_id: info.user_id,
+            viewer: info.user,
+            command: ACTION_ADD,
+            args: { trait }
+        });
+
+        alert("Команда отправлена!");
     };
 
     document.querySelector("#trait-remove-btn").onclick = async () => {
         const trait = document.querySelector("#trait-remove-input").value.trim();
         if (!trait) return;
-        await sendCommand(info.user_id, info.user, ACTION_REMOVE, trait);
+
+        await supabase.from("commands").insert({
+            user_id: info.user_id,
+            viewer: info.user,
+            command: ACTION_REMOVE,
+            args: { trait }
+        });
+
+        alert("Команда отправлена!");
     };
-}
-
-// ============================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ============================
-
-function toggleBox(selector) {
-    const box = document.querySelector(selector);
-    box.style.display = box.style.display === "block" ? "none" : "block";
-}
-
-async function sendCommand(user_id, username, command, trait) {
-    await supabase.from("commands").insert({
-        user_id,
-        viewer: username,
-        command,
-        args: { trait }
-    });
-
-    alert("Команда отправлена!");
 }
