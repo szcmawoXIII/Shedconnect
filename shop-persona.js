@@ -76,7 +76,7 @@ export async function renderShopPersona(info) {
 
             <hr>
 
-            <!-- НОВЫЙ ТОВАР — ПОДНЯТ ВВЕРХ -->
+            <!-- ЕДИНЫЙ ТОВАР: ПОВЫСИТЬ УРОВЕНЬ НАВЫКА -->
             <h3 style="margin-bottom:4px; font-size:14px;">Повысить уровень навыка</h3>
 
             <div class="shop-line">
@@ -267,4 +267,6 @@ export async function renderShopPersona(info) {
     document.querySelector("#skill-up-btn").onclick = () => {
         const skill = document.querySelector("#skill-up-input").value.trim();
         if (!skill) return;
-        copyToClipboard(`!skill ${skill
+        copyToClipboard(`!skill ${skill}`);
+    };
+}
