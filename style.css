@@ -235,33 +235,8 @@ body {
 }
 
 /* ================================
-   ПОЛОСКИ НУЖД
-================================ */
-
-.need-bar {
-    width: 100%;
-    height: 12px;
-    background: #222;
-    border: 1px solid #555;
-    margin-top: 2px;
-    margin-bottom: 6px;
-    position: relative;
-}
-
-.need-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4caf50, #2e7d32);
-}
-
-/* ================================
    КАТЫ
 ================================ */
-
-#pawn-name-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
 .kat-icon {
     width: 14px;
@@ -287,13 +262,58 @@ body {
     flex: 1.15;
 }
 
+/* ================================
+   ЕДИНЫЙ СТИЛЬ ТОВАРОВ
+================================ */
+
 .shop-line {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 6px;
     margin: 4px 0;
     padding: 2px 0;
     font-size: 14px;
+    line-height: 16px;
+}
+
+/* ================================
+   КОМПАКТНЫЕ ЭЛЕМЕНТЫ ТРЕЙТОВ
+================================ */
+
+.trait-input {
+    width: 120px;
+    font-size: 14px;
+    padding: 2px 4px;
+}
+
+.trait-drop {
+    padding: 2px 6px;
+    font-size: 12px;
+    line-height: 12px;
+}
+
+.trait-price {
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+.trait-list-box {
+    border: 1px solid #555;
+    padding: 6px;
+    margin-top: 4px;
+    max-height: 120px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.4);
+}
+
+.trait-item-small {
+    font-size: 13px;
+    padding: 2px 0;
+    cursor: pointer;
+}
+
+.trait-item-small:hover {
+    color: #ffd27f;
 }
 
 /* ================================
@@ -322,9 +342,9 @@ body {
 }
 
 .rw-button {
-    padding: 4px 10px;
+    padding: 3px 8px;
     background: var(--rw-btn-bg);
-    border-width: 3px;
+    border-width: 2px;
     border-style: solid;
     border-top-color: var(--rw-btn-top);
     border-left-color: var(--rw-btn-left);
@@ -333,7 +353,7 @@ body {
     outline: 1px solid var(--rw-btn-outline);
     color: #e0e0e0;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     user-select: none;
 }
 
@@ -351,19 +371,4 @@ body {
     border-left-color: var(--rw-btn-left-active);
     border-right-color: var(--rw-btn-right-active);
     border-bottom-color: var(--rw-btn-bottom-active);
-}
-
-/* ================================
-   Компактные RW‑кнопки магазина
-================================ */
-
-#shop-tab-persona .rw-button,
-#shop-tab-health .rw-button,
-#shop-tab-events .rw-button {
-    padding: 3px 8px;
-    font-size: 13px;
-    line-height: 14px;
-    height: auto;
-    min-height: 24px;
-    border-width: 2px;
 }
