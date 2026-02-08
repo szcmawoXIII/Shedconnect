@@ -111,7 +111,7 @@ body {
 }
 
 /* ================================
-   ПОЛОСКИ (ВОССТАНОВЛЕНО)
+   ПРОГРЕСС-БАРЫ (ЗДОРОВЬЕ/НАСТРОЕНИЕ)
 ================================ */
 
 .rw-bar {
@@ -125,7 +125,7 @@ body {
 }
 
 .rw-bar-fill {
-    width: 0%; /* критично для работы */
+    width: 0%;
     height: 100%;
     background: linear-gradient(90deg, #3bbf3b, #2a8f2a);
     transition: width 0.2s ease-out;
@@ -282,13 +282,13 @@ body {
 ================================ */
 
 .trait-input {
-    width: 170px; /* расширено */
+    width: 170px;
     font-size: 14px;
     padding: 2px 4px;
 }
 
 .trait-drop {
-    width: 30px;  /* квадратная кнопка */
+    width: 30px;
     height: 25px;
     padding: 0;
     font-size: 14px;
@@ -299,7 +299,6 @@ body {
     align-items: center;
 }
 
-/* кнопки магазина одинаковые */
 .trait-price-btn,
 .shop-line .rw-button {
     width: 66px;
@@ -331,7 +330,26 @@ body {
 }
 
 /* ================================
-   RimWorld BUTTONS
+   TOOLTIP
+================================ */
+
+.trait-tooltip {
+    position: absolute;
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid #666;
+    padding: 8px;
+    max-width: 260px;
+    font-size: 13px;
+    line-height: 16px;
+    color: #e0e0e0;
+    z-index: 9999;
+    pointer-events: none;
+    display: none;
+    box-shadow: 0 0 8px rgba(0,0,0,0.7);
+}
+
+/* ================================
+   RIMWORLD BUTTONS
 ================================ */
 
 :root {
@@ -385,4 +403,23 @@ body {
     border-left-color: var(--rw-btn-left-active);
     border-right-color: var(--rw-btn-right-active);
     border-bottom-color: var(--rw-btn-bottom-active);
+}
+
+/* ================================
+   ГОЛУБЫЕ RIMWORLD-БАРЫ ДЛЯ НУЖД
+================================ */
+
+.rw-need-bar {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    background: #1a1a1a;
+    border: 1px solid #4a6a8a;
+    overflow: hidden;
+}
+
+.rw-need-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6bbcff, #3a8fd8);
+    transition: width 0.25s ease-out;
 }
