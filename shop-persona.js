@@ -10,6 +10,13 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const ACTION_ADD = "trait_add";
 const ACTION_REMOVE = "trait_remove";
 
+// ============================
+// КОПИРОВАНИЕ В БУФЕР
+// ============================
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).catch(err => console.error("Clipboard error:", err));
+}
+
 export async function renderShopPersona(info) {
     const el = document.querySelector("#shop-tab-persona");
     if (!el) return;
@@ -19,7 +26,9 @@ export async function renderShopPersona(info) {
         return;
     }
 
-    // 1. Магазин
+    // ============================
+    // 1. Загружаем товары магазина
+    // ============================
     const { data: shopItems } = await supabase
         .from("shop_persona")
         .select("*")
@@ -29,19 +38,22 @@ export async function renderShopPersona(info) {
     const priceAdd = shopItems?.find(x => x.action === ACTION_ADD)?.price ?? 0;
     const priceRemove = shopItems?.find(x => x.action === ACTION_REMOVE)?.price ?? 0;
 
+    // обычные товары
     const oldItemsHtml = shopItems
         .filter(item => ![ACTION_ADD, ACTION_REMOVE].includes(item.action))
         .map(item => `
             <div class="shop-line">
                 <span>${item.label}</span>
-                <button class="rw-button trait-price-btn" data-action="${item.action}">
+                <button class="rw-button trait-price-btn shop-copy-btn" data-copy="!${item.action}">
                     ${item.price} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
         `)
         .join("");
 
-    // 2. Трейты
+    // ============================
+    // 2. Загружаем список трейтов
+    // ============================
     const { data: traits } = await supabase
         .from("traits")
         .select("label_ru, description_ru, enabled")
@@ -55,7 +67,9 @@ export async function renderShopPersona(info) {
         traitDescriptions[t.label_ru] = t.description_ru || "";
     });
 
-    // 3. Разметка (БЕЗ tooltip внутри)
+    // ============================
+    // 3. Рендер магазина
+    // ============================
     el.innerHTML = `
         <div style="font-size:14px;">
             ${oldItemsHtml}
@@ -92,7 +106,9 @@ export async function renderShopPersona(info) {
         </div>
     `;
 
+    // ============================
     // 4. Tooltip — ВСЕГДА в body
+    // ============================
     let tooltip = document.querySelector("#trait-tooltip");
     if (!tooltip) {
         tooltip = document.createElement("div");
@@ -123,7 +139,9 @@ export async function renderShopPersona(info) {
         });
     }
 
+    // ============================
     // 5. Автоподсказки
+    // ============================
     function filterTraits(inputSelector, listSelector, list) {
         const value = document.querySelector(inputSelector).value.trim().toLowerCase();
         const box = document.querySelector(listSelector);
@@ -159,20 +177,14 @@ export async function renderShopPersona(info) {
     }
 
     document.querySelector("#trait-add-input").oninput = () =>
-        filterTraits(
-            "#trait-add-input",
-            "#trait-list-box",
-            enabledTraits.map(t => t.label_ru)
-        );
+        filterTraits("#trait-add-input", "#trait-list-box", enabledTraits.map(t => t.label_ru));
 
     document.querySelector("#trait-remove-input").oninput = () =>
-        filterTraits(
-            "#trait-remove-input",
-            "#pawn-trait-list-box",
-            pawnTraits
-        );
+        filterTraits("#trait-remove-input", "#pawn-trait-list-box", pawnTraits);
 
+    // ============================
     // 6. Кнопки ▼
+    // ============================
     document.querySelector("#trait-add-dropdown").onclick = () => {
         const box = document.querySelector("#trait-list-box");
         box.style.display = box.style.display === "block" ? "none" : "block";
@@ -213,32 +225,29 @@ export async function renderShopPersona(info) {
         }
     };
 
-    // 7. Команды
-    document.querySelector("#trait-add-btn").onclick = async () => {
+    // ============================
+    // 7. Копирование команд
+    // ============================
+
+    // обычные товары
+    document.querySelectorAll(".shop-copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const cmd = btn.dataset.copy;
+            if (cmd) copyToClipboard(cmd);
+        });
+    });
+
+    // добавление трейта
+    document.querySelector("#trait-add-btn").onclick = () => {
         const trait = document.querySelector("#trait-add-input").value.trim();
         if (!trait) return;
-
-        await supabase.from("commands").insert({
-            user_id: info.user_id,
-            viewer: info.user,
-            command: ACTION_ADD,
-            args: { trait }
-        });
-
-        alert("Команда отправлена!");
+        copyToClipboard(`!trait add ${trait}`);
     };
 
-    document.querySelector("#trait-remove-btn").onclick = async () => {
+    // удаление трейта
+    document.querySelector("#trait-remove-btn").onclick = () => {
         const trait = document.querySelector("#trait-remove-input").value.trim();
         if (!trait) return;
-
-        await supabase.from("commands").insert({
-            user_id: info.user_id,
-            viewer: info.user,
-            command: ACTION_REMOVE,
-            args: { trait }
-        });
-
-        alert("Команда отправлена!");
+        copyToClipboard(`!trait remove ${trait}`);
     };
 }
