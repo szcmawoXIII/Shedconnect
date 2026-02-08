@@ -125,6 +125,7 @@ body {
 }
 
 .rw-bar-fill {
+    width: 0%; /* критично для работы */
     height: 100%;
     background: linear-gradient(90deg, #3bbf3b, #2a8f2a);
     transition: width 0.2s ease-out;
@@ -281,14 +282,14 @@ body {
 ================================ */
 
 .trait-input {
-    width: 170px; /* ★ NEW ★ расширено */
+    width: 170px; /* расширено */
     font-size: 14px;
     padding: 2px 4px;
 }
 
 .trait-drop {
-    width: 30px;  /* ★ NEW ★ */
-    height: 25px; /* ★ NEW ★ */
+    width: 30px;  /* квадратная кнопка */
+    height: 25px;
     padding: 0;
     font-size: 14px;
     line-height: 14px;
@@ -298,11 +299,11 @@ body {
     align-items: center;
 }
 
-/* ★ NEW ★ — одинаковая длина кнопок магазина */
+/* кнопки магазина одинаковые */
 .trait-price-btn,
 .shop-line .rw-button {
-    width: 66px;  /* ★ NEW ★ */
-    height: 25px; /* ★ NEW ★ */
+    width: 66px;
+    height: 25px;
     text-align: center;
     justify-content: center;
     display: flex;
