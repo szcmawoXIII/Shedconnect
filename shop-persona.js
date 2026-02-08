@@ -7,8 +7,11 @@ const SUPABASE_ANON_KEY = "sb_publishable_HjeSTZJOE2JEKBfuG1BxAQ_8oj30LvD";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Цена операций
-const TRAIT_PRICE = 1000;
+// Какие action соответствуют новым товарам
+const NEW_ACTIONS = {
+    add: "trait_add",
+    remove: "trait_remove"
+};
 
 export async function renderShopPersona(info) {
     const el = document.querySelector("#shop-tab-persona");
@@ -36,6 +39,7 @@ export async function renderShopPersona(info) {
         shopHtml = `<div>Товары магазина отключены.</div>`;
     } else {
         shopHtml = shopItems
+            .filter(item => !["trait_add", "trait_remove"].includes(item.action))
             .map(item => {
                 return `
                     <div class="shop-line">
@@ -52,7 +56,7 @@ export async function renderShopPersona(info) {
     // ============================
     // 2. Загружаем список трейтов
     // ============================
-    const { data: traits, error: traitError } = await supabase
+    const { data: traits } = await supabase
         .from("traits")
         .select("label_ru, enabled")
         .order("label_ru", { ascending: true });
@@ -69,7 +73,13 @@ export async function renderShopPersona(info) {
         .join("");
 
     // ============================
-    // 3. Рендер магазина
+    // 3. Загружаем цены новых товаров
+    // ============================
+    const priceAdd = shopItems?.find(x => x.action === NEW_ACTIONS.add)?.price ?? 0;
+    const priceRemove = shopItems?.find(x => x.action === NEW_ACTIONS.remove)?.price ?? 0;
+
+    // ============================
+    // 4. Рендер магазина
     // ============================
     el.innerHTML = `
         <div style="font-size:15px;">
@@ -82,7 +92,7 @@ export async function renderShopPersona(info) {
             <div class="shop-line" style="font-size:13px;">
                 <input id="trait-add-input" class="rw-input" placeholder="Введите название трейта">
                 <button id="trait-add-btn" class="rw-button">
-                    ${TRAIT_PRICE} <img src="img/catcoin.png" class="kat-icon">
+                    ${priceAdd} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
@@ -101,7 +111,7 @@ export async function renderShopPersona(info) {
             <div class="shop-line" style="font-size:13px;">
                 <input id="trait-remove-input" class="rw-input" placeholder="Введите название трейта">
                 <button id="trait-remove-btn" class="rw-button">
-                    ${TRAIT_PRICE} <img src="img/catcoin.png" class="kat-icon">
+                    ${priceRemove} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
@@ -116,24 +126,21 @@ export async function renderShopPersona(info) {
     `;
 
     // ============================
-    // 4. Обработчики кнопок
+    // 5. Обработчики кнопок
     // ============================
 
-    // Покупка трейта
     document.querySelector("#trait-add-btn").onclick = async () => {
         const trait = document.querySelector("#trait-add-input").value.trim();
         if (!trait) return;
-        await buyTrait(info.user_id, info.user, "trait_add", trait);
+        await sendCommand(info.user_id, info.user, NEW_ACTIONS.add, trait);
     };
 
-    // Удаление трейта
     document.querySelector("#trait-remove-btn").onclick = async () => {
         const trait = document.querySelector("#trait-remove-input").value.trim();
         if (!trait) return;
-        await buyTrait(info.user_id, info.user, "trait_remove", trait);
+        await sendCommand(info.user_id, info.user, NEW_ACTIONS.remove, trait);
     };
 
-    // Сворачивание списка трейтов
     document.querySelector("#toggle-trait-list").onclick = () => {
         const box = document.querySelector("#trait-list-box");
         const btn = document.querySelector("#toggle-trait-list");
@@ -142,7 +149,6 @@ export async function renderShopPersona(info) {
         btn.textContent = visible ? "Показать список трейтов" : "Скрыть список трейтов";
     };
 
-    // Сворачивание списка трейтов пешки
     document.querySelector("#toggle-pawn-trait-list").onclick = () => {
         const box = document.querySelector("#pawn-trait-list-box");
         const btn = document.querySelector("#toggle-pawn-trait-list");
@@ -153,29 +159,10 @@ export async function renderShopPersona(info) {
 }
 
 // ============================
-// ПОКУПКА ТРЕЙТА
+// ОТПРАВКА КОМАНДЫ В ИГРУ
 // ============================
 
-async function buyTrait(user_id, username, command, trait) {
-    // 1. Проверяем баланс
-    const { data: balRow } = await supabase
-        .from("balances")
-        .select("balance")
-        .eq("user_id", user_id)
-        .single();
-
-    if (!balRow || balRow.balance < TRAIT_PRICE) {
-        alert("Недостаточно катов!");
-        return;
-    }
-
-    // 2. Списываем деньги
-    await supabase
-        .from("balances")
-        .update({ balance: balRow.balance - TRAIT_PRICE })
-        .eq("user_id", user_id);
-
-    // 3. Отправляем команду в игру
+async function sendCommand(user_id, username, command, trait) {
     await supabase.from("commands").insert({
         user_id,
         viewer: username,
