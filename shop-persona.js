@@ -9,7 +9,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const ACTION_ADD = "trait_add";
 const ACTION_REMOVE = "trait_remove";
-const ACTION_SKILL_UP = "skill_up";
+const ACTION_SKILL_UP = "skill";   // ← ВАЖНО: теперь совпадает с таблицей
 
 // ============================
 // КОПИРОВАНИЕ В БУФЕР
@@ -39,19 +39,21 @@ export async function renderShopPersona(info) {
     const priceAdd = shopItems?.find(x => x.action === ACTION_ADD)?.price ?? 0;
     const priceRemove = shopItems?.find(x => x.action === ACTION_REMOVE)?.price ?? 0;
 
+    // товар id=9
     const skillItem = shopItems?.find(x => x.action === ACTION_SKILL_UP);
     const priceSkill = skillItem?.price ?? 0;
     const labelSkill = skillItem?.label ?? "Повысить уровень навыка";
 
-    // обычные товары (кроме trait_add / trait_remove / skill_up)
+    // обычные товары (кроме trait_add / trait_remove / skill)
     const regularItems = (shopItems ?? []).filter(
         item => ![ACTION_ADD, ACTION_REMOVE, ACTION_SKILL_UP].includes(item.action)
     );
 
     const regularItemsHtml = regularItems
         .map(item => `
+            <h3 style="margin-bottom:4px; font-size:14px;">${item.label}</h3>
+
             <div class="shop-line">
-                <span>${item.label}</span>
                 <button class="rw-button trait-price-btn shop-copy-btn" data-copy="!${item.action}">
                     ${item.price} <img src="img/catcoin.png" class="kat-icon">
                 </button>
@@ -80,11 +82,12 @@ export async function renderShopPersona(info) {
     // ============================
     el.innerHTML = `
         <div style="font-size:14px;">
+
             ${regularItemsHtml}
 
             <hr>
 
-            <!-- ПОВЫШЕНИЕ НАВЫКА (СИНХРОН С ТАБЛИЦЕЙ) -->
+            <!-- ПОВЫШЕНИЕ НАВЫКА (из id=9) -->
             <h3 style="margin-bottom:4px; font-size:14px;">${labelSkill}</h3>
 
             <div class="shop-line">
