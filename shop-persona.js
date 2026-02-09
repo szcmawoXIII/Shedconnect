@@ -43,18 +43,15 @@ export async function renderShopPersona(info) {
     const priceSkill = skillItem?.price ?? 0;
     const labelSkill = skillItem?.label ?? "Повысить уровень навыка";
 
-    // ============================
-    // 1.1. Обычные товары (верхние)
-    // ============================
+    // обычные товары (кроме trait_add / trait_remove / skill_up)
     const regularItems = (shopItems ?? []).filter(
         item => ![ACTION_ADD, ACTION_REMOVE, ACTION_SKILL_UP].includes(item.action)
     );
 
     const regularItemsHtml = regularItems
         .map(item => `
-            <h3 style="margin-bottom:4px; font-size:14px;">${item.label}</h3>
-
             <div class="shop-line">
+                <span>${item.label}</span>
                 <button class="rw-button trait-price-btn shop-copy-btn" data-copy="!${item.action}">
                     ${item.price} <img src="img/catcoin.png" class="kat-icon">
                 </button>
@@ -83,13 +80,11 @@ export async function renderShopPersona(info) {
     // ============================
     el.innerHTML = `
         <div style="font-size:14px;">
-
-            <!-- ВЕРХНИЕ ТОВАРЫ ИЗ ТАБЛИЦЫ -->
             ${regularItemsHtml}
 
             <hr>
 
-            <!-- ПОВЫШЕНИЕ НАВЫКА -->
+            <!-- ПОВЫШЕНИЕ НАВЫКА (СИНХРОН С ТАБЛИЦЕЙ) -->
             <h3 style="margin-bottom:4px; font-size:14px;">${labelSkill}</h3>
 
             <div class="shop-line">
@@ -101,7 +96,6 @@ export async function renderShopPersona(info) {
 
             <hr>
 
-            <!-- ДОБАВИТЬ ЧЕРТУ -->
             <h3 style="margin-bottom:4px; font-size:14px;">Добавить черту</h3>
 
             <div class="shop-line">
@@ -117,7 +111,6 @@ export async function renderShopPersona(info) {
 
             <hr>
 
-            <!-- УДАЛИТЬ ЧЕРТУ -->
             <h3 style="margin-bottom:4px; font-size:14px;">Удалить черту</h3>
 
             <div class="shop-line">
