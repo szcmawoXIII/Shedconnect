@@ -439,6 +439,55 @@ body {
     box-shadow: 0 0 8px rgba(0,0,0,0.7);
 }
 
+----------------------------------------------------------------------
+.events-coming-soon {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.events-box {
+    background: rgba(0,0,0,0.45);
+    border: 1px solid #666;
+    padding: 18px 22px;
+    width: 360px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 14px;
+    color: #ddd;
+    box-shadow: 0 0 12px rgba(0,0,0,0.4);
+}
+
+.events-icon {
+    width: 48px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.events-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #fff;
+}
+
+.events-text {
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.events-sub {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 
 
 
