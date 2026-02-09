@@ -3,41 +3,46 @@ export function renderShopEvents(info) {
     if (!el) return;
 
     el.innerHTML = `
-        <div class="events-wrapper">
+<pre class="events-ascii" style="
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.25;
+    color: #ccc;
+    padding: 12px;
+    white-space: pre-wrap;
+">
 
-            <div class="events-panel">
+   ╔══════════════════════════════════════════════╗
+   ║                                              ║
+   ║        ███╗   ██╗██╗   ██╗██╗   ██╗          ║
+   ║        ████╗  ██║██║   ██║╚██╗ ██╔╝          ║
+   ║        ██╔██╗ ██║██║   ██║ ╚████╔╝           ║
+   ║        ██║╚██╗██║██║   ██║  ╚██╔╝            ║
+   ║        ██║ ╚████║╚██████╔╝   ██║             ║
+   ║        ╚═╝  ╚═══╝ ╚═════╝    ╚═╝             ║
+   ║                                              ║
+   ║        МАГАЗИН ИВЕНТОВ — В РАЗРАБОТКЕ        ║
+   ║                                              ║
+   ╠══════════════════════════════════════════════╣
+   ║                                              ║
+   ║   В версии 2.0 появится новая система:       ║
+   ║                                              ║
+   ║   • Рейды зрителей                           ║
+   ║   • Погодные аномалии                        ║
+   ║   • Подарки и баффы                          ║
+   ║   • Случайные события                        ║
+   ║   • Вмешательство в ход колонии              ║
+   ║                                              ║
+   ║   Всё это можно будет покупать прямо         ║
+   ║   из чата — как и остальные товары.          ║
+   ║                                              ║
+   ╠══════════════════════════════════════════════╣
+   ║                                              ║
+   ║        Ожидайте обновление 2.0…              ║
+   ║        Оно будет мощным.                     ║
+   ║                                              ║
+   ╚══════════════════════════════════════════════╝
 
-                <div class="events-header">
-                    <img src="img/event_future.png" class="events-header-icon">
-                    <div class="events-header-title">Магазин ивентов</div>
-                </div>
-
-                <div class="events-divider"></div>
-
-                <div class="events-body">
-                    <div class="events-coming-title">Готовится обновление 2.0</div>
-
-                    <div class="events-coming-text">
-                        Мы создаём новую систему событий, которая позволит зрителям
-                        влиять на происходящее в колонии: вызывать рейды, дарить ресурсы,
-                        менять погоду, усиливать или ослаблять пешек, запускать цепочки
-                        случайных событий и многое другое.
-                    </div>
-
-                    <div class="events-coming-sub">
-                        Всё это появится в версии <span class="events-highlight">2.0</span>.
-                        Следите за обновлениями — впереди много интересного.
-                    </div>
-                </div>
-
-                <div class="events-footer">
-                    <div class="events-footer-line"></div>
-                    <div class="events-footer-text">Система ивентов находится в разработке</div>
-                    <div class="events-footer-line"></div>
-                </div>
-
-            </div>
-
-        </div>
+</pre>
     `;
 }
