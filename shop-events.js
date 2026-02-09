@@ -35,7 +35,7 @@ export function renderShopEvents(info) {
 ⠄⠄⠄⠄⠄⠄⠄⠄⠉⠙⠻⠿⠿⣿⣿⣿⣿⠿⠿⠛⠉⠄⠄⠄⠄⠄⠄⠄⠄⠄
 ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄ 
 
-   Будет добавлено в ShedConnect v2.0
+  Будет добавлено в ShedConnect v3.0
 
               
 </pre>
