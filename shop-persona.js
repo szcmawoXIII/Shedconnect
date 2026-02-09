@@ -38,9 +38,14 @@ export async function renderShopPersona(info) {
     const priceAdd = shopItems?.find(x => x.action === ACTION_ADD)?.price ?? 0;
     const priceRemove = shopItems?.find(x => x.action === ACTION_REMOVE)?.price ?? 0;
 
-    // обычные товары
-    const oldItemsHtml = shopItems
-        .filter(item => ![ACTION_ADD, ACTION_REMOVE].includes(item.action))
+    // ============================
+    // 1.1. Обычные товары (НЕ trait_add/remove)
+    // ============================
+    const regularItems = shopItems.filter(
+        item => ![ACTION_ADD, ACTION_REMOVE].includes(item.action)
+    );
+
+    const regularItemsHtml = regularItems
         .map(item => `
             <div class="shop-line">
                 <span>${item.label}</span>
@@ -72,11 +77,13 @@ export async function renderShopPersona(info) {
     // ============================
     el.innerHTML = `
         <div style="font-size:14px;">
-            ${oldItemsHtml}
+
+            <!-- ДИНАМИЧЕСКИЕ ТОВАРЫ ИЗ ТАБЛИЦЫ -->
+            ${regularItemsHtml}
 
             <hr>
 
-            <!-- ЕДИНЫЙ ТОВАР: ПОВЫСИТЬ УРОВЕНЬ НАВЫКА -->
+            <!-- ПОВЫШЕНИЕ НАВЫКА -->
             <h3 style="margin-bottom:4px; font-size:14px;">Повысить уровень навыка</h3>
 
             <div class="shop-line">
@@ -88,6 +95,7 @@ export async function renderShopPersona(info) {
 
             <hr>
 
+            <!-- ДОБАВИТЬ ЧЕРТУ -->
             <h3 style="margin-bottom:4px; font-size:14px;">Добавить черту</h3>
 
             <div class="shop-line">
@@ -103,6 +111,7 @@ export async function renderShopPersona(info) {
 
             <hr>
 
+            <!-- УДАЛИТЬ ЧЕРТУ -->
             <h3 style="margin-bottom:4px; font-size:14px;">Удалить черту</h3>
 
             <div class="shop-line">
