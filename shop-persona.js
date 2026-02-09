@@ -9,7 +9,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const ACTION_ADD = "trait_add";
 const ACTION_REMOVE = "trait_remove";
-const ACTION_SKILL_UP = "skill";   // ← ВАЖНО: теперь совпадает с таблицей
+const ACTION_SKILL_UP = "skill";   // ← совпадает с таблицей
 
 // ============================
 // КОПИРОВАНИЕ В БУФЕР
@@ -44,16 +44,17 @@ export async function renderShopPersona(info) {
     const priceSkill = skillItem?.price ?? 0;
     const labelSkill = skillItem?.label ?? "Повысить уровень навыка";
 
-    // обычные товары (кроме trait_add / trait_remove / skill)
+    // ============================
+    // 1.1. Верхние товары (в одну строку)
+    // ============================
     const regularItems = (shopItems ?? []).filter(
         item => ![ACTION_ADD, ACTION_REMOVE, ACTION_SKILL_UP].includes(item.action)
     );
 
     const regularItemsHtml = regularItems
         .map(item => `
-            <h3 style="margin-bottom:4px; font-size:14px;">${item.label}</h3>
-
             <div class="shop-line">
+                <span>${item.label}</span>
                 <button class="rw-button trait-price-btn shop-copy-btn" data-copy="!${item.action}">
                     ${item.price} <img src="img/catcoin.png" class="kat-icon">
                 </button>
@@ -83,15 +84,16 @@ export async function renderShopPersona(info) {
     el.innerHTML = `
         <div style="font-size:14px;">
 
+            <!-- ВЕРХНИЕ ТОВАРЫ (одна строка) -->
             ${regularItemsHtml}
 
             <hr>
 
-            <!-- ПОВЫШЕНИЕ НАВЫКА (из id=9) -->
+            <!-- ПОВЫШЕНИЕ НАВЫКА (две строки) -->
             <h3 style="margin-bottom:4px; font-size:14px;">${labelSkill}</h3>
 
             <div class="shop-line">
-                <input id="skill-up-input" class="rw-input trait-input" placeholder="Навык">
+                <input id="skill-up-input" class="rw-input trait-input" style="width:220px;" placeholder="Навык">
                 <button id="skill-up-btn" class="rw-button trait-price-btn">
                     ${priceSkill} <img src="img/catcoin.png" class="kat-icon">
                 </button>
@@ -99,6 +101,7 @@ export async function renderShopPersona(info) {
 
             <hr>
 
+            <!-- ДОБАВИТЬ ЧЕРТУ -->
             <h3 style="margin-bottom:4px; font-size:14px;">Добавить черту</h3>
 
             <div class="shop-line">
@@ -114,6 +117,7 @@ export async function renderShopPersona(info) {
 
             <hr>
 
+            <!-- УДАЛИТЬ ЧЕРТУ -->
             <h3 style="margin-bottom:4px; font-size:14px;">Удалить черту</h3>
 
             <div class="shop-line">
@@ -252,7 +256,7 @@ export async function renderShopPersona(info) {
     // 7. Копирование команд
     // ============================
 
-    // обычные товары
+    // верхние товары
     document.querySelectorAll(".shop-copy-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             const cmd = btn.dataset.copy;
