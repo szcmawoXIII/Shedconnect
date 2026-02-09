@@ -9,6 +9,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const ACTION_ADD = "trait_add";
 const ACTION_REMOVE = "trait_remove";
+const ACTION_SKILL_UP = "skill_up";
 
 // ============================
 // КОПИРОВАНИЕ В БУФЕР
@@ -38,11 +39,13 @@ export async function renderShopPersona(info) {
     const priceAdd = shopItems?.find(x => x.action === ACTION_ADD)?.price ?? 0;
     const priceRemove = shopItems?.find(x => x.action === ACTION_REMOVE)?.price ?? 0;
 
-    // ============================
-    // 1.1. Обычные товары (НЕ trait_add/remove)
-    // ============================
-    const regularItems = shopItems.filter(
-        item => ![ACTION_ADD, ACTION_REMOVE].includes(item.action)
+    const skillItem = shopItems?.find(x => x.action === ACTION_SKILL_UP);
+    const priceSkill = skillItem?.price ?? 0;
+    const labelSkill = skillItem?.label ?? "Повысить уровень навыка";
+
+    // обычные товары (кроме trait_add / trait_remove / skill_up)
+    const regularItems = (shopItems ?? []).filter(
+        item => ![ACTION_ADD, ACTION_REMOVE, ACTION_SKILL_UP].includes(item.action)
     );
 
     const regularItemsHtml = regularItems
@@ -77,25 +80,22 @@ export async function renderShopPersona(info) {
     // ============================
     el.innerHTML = `
         <div style="font-size:14px;">
-
-            <!-- ДИНАМИЧЕСКИЕ ТОВАРЫ ИЗ ТАБЛИЦЫ -->
             ${regularItemsHtml}
 
             <hr>
 
-            <!-- ПОВЫШЕНИЕ НАВЫКА -->
-            <h3 style="margin-bottom:4px; font-size:14px;">Повысить уровень навыка</h3>
+            <!-- ПОВЫШЕНИЕ НАВЫКА (СИНХРОН С ТАБЛИЦЕЙ) -->
+            <h3 style="margin-bottom:4px; font-size:14px;">${labelSkill}</h3>
 
             <div class="shop-line">
                 <input id="skill-up-input" class="rw-input trait-input" placeholder="Навык">
                 <button id="skill-up-btn" class="rw-button trait-price-btn">
-                    500 <img src="img/catcoin.png" class="kat-icon">
+                    ${priceSkill} <img src="img/catcoin.png" class="kat-icon">
                 </button>
             </div>
 
             <hr>
 
-            <!-- ДОБАВИТЬ ЧЕРТУ -->
             <h3 style="margin-bottom:4px; font-size:14px;">Добавить черту</h3>
 
             <div class="shop-line">
@@ -111,7 +111,6 @@ export async function renderShopPersona(info) {
 
             <hr>
 
-            <!-- УДАЛИТЬ ЧЕРТУ -->
             <h3 style="margin-bottom:4px; font-size:14px;">Удалить черту</h3>
 
             <div class="shop-line">
