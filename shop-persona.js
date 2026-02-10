@@ -74,6 +74,24 @@ export async function renderShopPersona(info) {
     });
 
     // ============================
+    // СПИСОК НАВЫКОВ
+    // ============================
+    const skillList = [
+        "Дальний бой",
+        "Ближний бой",
+        "Строительство",
+        "Горное дело",
+        "Кулинария",
+        "Растениеводство",
+        "Животноводство",
+        "Ремесло",
+        "Искусство",
+        "Медицина",
+        "Общение",
+        "Умственный труд"
+    ];
+
+    // ============================
     // 3. Рендер магазина
     // ============================
     el.innerHTML = `
@@ -87,39 +105,54 @@ export async function renderShopPersona(info) {
             <!-- ПОВЫШЕНИЕ НАВЫКА -->
             ${itemSkill ? `
                 <h3 style="margin-bottom:4px; font-size:14px;">${itemSkill.label}</h3>
+
                 <div class="shop-line">
-                    <input id="skill-up-input" class="rw-input trait-input" style="width:220px;" placeholder="Навык">
+                    <input id="skill-up-input" class="rw-input trait-input" 
+                           style="width:220px;" placeholder="Навык" readonly>
+
+                    <button id="skill-up-dropdown" class="rw-button trait-drop">▼</button>
+
                     <button id="skill-up-btn" class="rw-button trait-price-btn">
                         ${itemSkill.price} <img src="img/catcoin.png" class="kat-icon">
                     </button>
                 </div>
+
+                <div id="skill-list-box" class="trait-list-box" style="display:none;"></div>
+
                 <hr>
             ` : ""}
 
             <!-- ДОБАВИТЬ ЧЕРТУ -->
             ${itemAdd ? `
                 <h3 style="margin-bottom:4px; font-size:14px;">Добавить черту</h3>
+
                 <div class="shop-line">
                     <input id="trait-add-input" class="rw-input trait-input" placeholder="Трейт">
                     <button id="trait-add-dropdown" class="rw-button trait-drop">▼</button>
+
                     <button id="trait-add-btn" class="rw-button trait-price-btn">
                         ${itemAdd.price} <img src="img/catcoin.png" class="kat-icon">
                     </button>
                 </div>
+
                 <div id="trait-list-box" class="trait-list-box" style="display:none;"></div>
+
                 <hr>
             ` : ""}
 
             <!-- УДАЛИТЬ ЧЕРТУ -->
             ${itemRemove ? `
                 <h3 style="margin-bottom:4px; font-size:14px;">Удалить черту</h3>
+
                 <div class="shop-line">
                     <input id="trait-remove-input" class="rw-input trait-input" placeholder="Трейт">
                     <button id="trait-remove-dropdown" class="rw-button trait-drop">▼</button>
+
                     <button id="trait-remove-btn" class="rw-button trait-price-btn">
                         ${itemRemove.price} <img src="img/catcoin.png" class="kat-icon">
                     </button>
                 </div>
+
                 <div id="pawn-trait-list-box" class="trait-list-box" style="display:none;"></div>
             ` : ""}
 
@@ -160,7 +193,7 @@ export async function renderShopPersona(info) {
     }
 
     // ============================
-    // 5. Автоподсказки
+    // 5. Автоподсказки (трейты)
     // ============================
     function filterTraits(inputSelector, listSelector, list) {
         const value = document.querySelector(inputSelector).value.trim().toLowerCase();
@@ -207,8 +240,31 @@ export async function renderShopPersona(info) {
     }
 
     // ============================
-    // 6. Кнопки ▼
+    // 6. Кнопки ▼ (трейты + навыки)
     // ============================
+
+    // ▼ навыки
+    if (itemSkill) {
+        document.querySelector("#skill-up-dropdown").onclick = () => {
+            const box = document.querySelector("#skill-list-box");
+            box.style.display = box.style.display === "block" ? "none" : "block";
+
+            if (box.style.display === "block") {
+                box.innerHTML = skillList
+                    .map(s => `<div class="trait-item-small">${s}</div>`)
+                    .join("");
+
+                box.querySelectorAll(".trait-item-small").forEach(el => {
+                    el.onclick = () => {
+                        document.querySelector("#skill-up-input").value = el.textContent.trim();
+                        box.style.display = "none";
+                    };
+                });
+            }
+        };
+    }
+
+    // ▼ добавить черту
     if (itemAdd) {
         document.querySelector("#trait-add-dropdown").onclick = () => {
             const box = document.querySelector("#trait-list-box");
@@ -231,6 +287,7 @@ export async function renderShopPersona(info) {
         };
     }
 
+    // ▼ удалить черту
     if (itemRemove) {
         document.querySelector("#trait-remove-dropdown").onclick = () => {
             const box = document.querySelector("#pawn-trait-list-box");
